@@ -1,0 +1,8 @@
+package com.gruptiga.smartlaundry.constant;
+
+public class ConstantTable {
+    public static final String ACCOUNT = "m_accounts";
+    public static final String CUSTOMER = "m_customers";
+    public static final String SERVICETYPE = "m_services_type";
+    public static final String TRANSACTION = "t_transactions";
+}
