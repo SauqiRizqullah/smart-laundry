@@ -1,5 +1,6 @@
 package com.gruptiga.smartlaundry.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gruptiga.smartlaundry.constant.ConstantTable;
 import com.gruptiga.smartlaundry.constant.Payment;
 import com.gruptiga.smartlaundry.constant.Status;
@@ -8,6 +9,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.util.Date;
+import java.util.List;
 
 @Setter
 @Getter
@@ -40,8 +42,9 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private Status status; //enum
 
-    @Column(name = "berat")
-    private Integer berat;
+    @OneToMany(mappedBy = "trx")
+    @JsonManagedReference
+    private List<TransactionDetail> transactionDetailList;
 
     @Column(name = "total_price")
     private Long totalPrice;
