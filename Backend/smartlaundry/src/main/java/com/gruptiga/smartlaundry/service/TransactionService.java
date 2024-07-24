@@ -1,0 +1,15 @@
+package com.gruptiga.smartlaundry.service;
+
+import com.gruptiga.smartlaundry.dto.request.TransactionRequest;
+import com.gruptiga.smartlaundry.dto.response.TransactionResponse;
+
+import java.util.List;
+
+public interface TransactionService {
+
+    TransactionResponse createNewTransaction (TransactionRequest request);
+
+    List<TransactionResponse> getAllTransactions();
+
+    TransactionResponse updateStatusDone(String id);
+}

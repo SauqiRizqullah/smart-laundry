@@ -4,6 +4,7 @@ import com.gruptiga.smartlaundry.constant.APIUrl;
 import com.gruptiga.smartlaundry.dto.request.SearchAccountRequest;
 import com.gruptiga.smartlaundry.dto.response.AccountResponse;
 import com.gruptiga.smartlaundry.dto.response.CommonResponse;
+import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,11 +20,11 @@ public class AccountController {
     private final AccountService accountService;
 
     @GetMapping(path = APIUrl.PATH_VAR_ACCOUNT_ID, produces = "application/json")
-    public ResponseEntity<CommonResponse<AccountResponse>> getById (
+    public ResponseEntity<CommonResponse<Account>> getById (
             @PathVariable String accountId
     ) {
-        AccountResponse accountResponse = accountService.getById(accountId);
-        CommonResponse<AccountResponse> response = CommonResponse.<AccountResponse>builder()
+        Account accountResponse = accountService.getById(accountId);
+        CommonResponse<Account> response = CommonResponse.<Account>builder()
                 .statusCode(HttpStatus.CREATED.value())
                 .message("Data akun laundry berhasil didapatkan!!!")
                 .data(accountResponse)

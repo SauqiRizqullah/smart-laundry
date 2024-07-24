@@ -23,8 +23,8 @@ public class Transaction {
     @Id
     @GeneratedValue(generator = "custom-id")
     @GenericGenerator(name = "custom-id", strategy = "com.gruptiga.smartlaundry.utils.TransactionCustomId")
-    @Column(name = "transaction_id")
-    private String transactionId;
+    @Column(name = "trx_id")
+    private String trxId;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
@@ -33,10 +33,6 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
-
-    @ManyToOne
-    @JoinColumn(name = "service_type_id")
-    private ServiceType serviceType;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

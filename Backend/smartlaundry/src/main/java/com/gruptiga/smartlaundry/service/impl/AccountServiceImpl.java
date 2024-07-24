@@ -59,10 +59,10 @@ public class AccountServiceImpl implements AccountService {
 
 
     @Override
-    public AccountResponse getById(String accountId) {
+    public Account getById(String accountId) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id Customer tidak ditemukan!!!"));
 
-        return parseAccountToAccountResponse(account);
+        return account;
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.gruptiga.smartlaundry.dto.request.SearchServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.response.CommonResponse;
 import com.gruptiga.smartlaundry.dto.response.ServiceTypeResponse;
+import com.gruptiga.smartlaundry.entity.ServiceType;
 import com.gruptiga.smartlaundry.service.ServiceTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
@@ -36,12 +37,12 @@ public class ServiceTypeController {
     }
 
     @GetMapping(path = APIUrl.PATH_VAR_SERVICETYPE_ID, produces = "application/json")
-    public ResponseEntity<CommonResponse<ServiceTypeResponse>> getById (
+    public ResponseEntity<CommonResponse<ServiceType>> getById (
             @PathVariable String serviceTypeId
     ) {
-        ServiceTypeResponse serviceType = typeService.getById(serviceTypeId);
+        ServiceType serviceType = typeService.getById(serviceTypeId);
 
-        CommonResponse<ServiceTypeResponse> response = CommonResponse.<ServiceTypeResponse>builder()
+        CommonResponse<ServiceType> response = CommonResponse.<ServiceType>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Data pelayanan laundry berhasil didapatkan!!!")
                 .data(serviceType)

@@ -57,10 +57,10 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
     }
 
     @Override
-    public ServiceTypeResponse getById(String serviceTypeId) {
+    public ServiceType getById(String serviceTypeId) {
         ServiceType serviceType = serviceTypeRepository.findById(serviceTypeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id pelayanan laundry tidak ditemukan!!!"));
 
-        return parseServiceTypeToServiceTypeResponse(serviceType);
+        return serviceType;
     }
 
     @Override

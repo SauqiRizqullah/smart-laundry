@@ -19,18 +19,19 @@ public class TransactionDetail {
     @GeneratedValue(generator = "custom-id")
     @GenericGenerator(name = "custom-id", strategy = "com.gruptiga.smartlaundry.utils.TransactionDetailCustomId")
     @Column(name = "trx_detail_id")
-    private String transactionDetailId;
+    private String trxDetailId;
 
     @ManyToOne
     @JoinColumn(name = "trx_id", nullable = false)
     @JsonBackReference
     private Transaction trx;
 
+    @ManyToOne
+    @JoinColumn(name = "service_type_id")
+    private ServiceType serviceType;
+
     @Column(name = "qty")
     private Integer qty;
-
-    @Column(name = "detail")
-    private String detail;
 
     @Column(name = "price")
     private Long price;

@@ -7,4 +7,6 @@ public class APIUrl {
     public static final String PATH_VAR_ACCOUNT_ID = "/{accountId}";
     public static final String SERVICETYPE = "/api/v1/servicestype";
     public static final String PATH_VAR_SERVICETYPE_ID = "/{serviceTypeId}";
+    public static final String TRANSACTION = "/api/v1/transactions";
+    public static final String PATH_VAR_TRANSACTION_ID = "/{trxId}";
 }
