@@ -22,6 +22,10 @@ public class ServiceType {
     @Column(name = "service_type_id")
     private String serviceTypeId;
 
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
+
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
     private Type type; //enum

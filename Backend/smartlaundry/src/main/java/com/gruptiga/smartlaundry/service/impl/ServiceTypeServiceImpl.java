@@ -5,8 +5,10 @@ import com.gruptiga.smartlaundry.constant.Type;
 import com.gruptiga.smartlaundry.dto.request.SearchServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.response.ServiceTypeResponse;
+import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.entity.ServiceType;
 import com.gruptiga.smartlaundry.repository.ServiceTypeRepository;
+import com.gruptiga.smartlaundry.service.AccountService;
 import com.gruptiga.smartlaundry.service.ServiceTypeService;
 import com.gruptiga.smartlaundry.specification.ServiceTypeSpecification;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +24,16 @@ import java.util.List;
 public class ServiceTypeServiceImpl implements ServiceTypeService {
     private final ServiceTypeRepository serviceTypeRepository;
 
+    private final AccountService accountService;
+
 
     @Override
     public ServiceTypeResponse createServiceType(ServiceTypeRequest serviceTypeRequest) {
 
+        Account account = accountService.getById(serviceTypeRequest.getAccountId());
 
         ServiceType serviceType = ServiceType.builder()
+                .account(account)
                 .type(Type.valueOf(serviceTypeRequest.getType()))
                 .service(serviceTypeRequest.getService())
                 .price(serviceTypeRequest.getPrice())
@@ -49,6 +55,7 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
 
         return ServiceTypeResponse.builder()
                 .serviceTypeId(id)
+                .accountId(serviceType.getAccount().getAccountId())
                 .type(serviceType.getType().toString())
                 .service(serviceType.getService())
                 .price(serviceType.getPrice())

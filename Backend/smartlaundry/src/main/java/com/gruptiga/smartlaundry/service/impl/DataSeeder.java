@@ -55,6 +55,7 @@ public class DataSeeder {
         if (typeService.count() == 0){
 
             ServiceTypeRequest type1 = new ServiceTypeRequest();
+            type1.setAccountId("A001");
             type1.setType(Type.REGULAR.toString());
             type1.setService("Cuci Full");
             type1.setPrice(parseLong("8000"));
@@ -63,6 +64,7 @@ public class DataSeeder {
             typeService.createServiceType(type1);
 
             ServiceTypeRequest type2 = new ServiceTypeRequest();
+            type2.setAccountId("A001");
             type2.setType(Type.EXPRESS.toString());
             type2.setService("Cuci Full");
             type2.setPrice(parseLong("11000"));
@@ -71,6 +73,7 @@ public class DataSeeder {
             typeService.createServiceType(type2);
 
             ServiceTypeRequest type3 = new ServiceTypeRequest();
+            type3.setAccountId("A001");
             type3.setType(Type.ONEDAY.toString());
             type3.setService("Cuci Full");
             type3.setPrice(parseLong("15000"));

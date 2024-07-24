@@ -1,5 +1,6 @@
 package com.gruptiga.smartlaundry.service;
 
+import com.gruptiga.smartlaundry.dto.request.SearchTransactionRequest;
 import com.gruptiga.smartlaundry.dto.request.TransactionRequest;
 import com.gruptiga.smartlaundry.dto.response.TransactionResponse;
 
@@ -12,4 +13,8 @@ public interface TransactionService {
     List<TransactionResponse> getAllTransactions();
 
     TransactionResponse updateStatusDone(String id);
+
+    List<TransactionResponse> getByDateAndAccount(String date, String accountId);
+
+    List<TransactionResponse> getAllTransactionsBaru(SearchTransactionRequest request);
 }

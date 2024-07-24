@@ -11,6 +11,10 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class ServiceTypeRequest {
+
+    @NotBlank(message = "Id akun laundry wajib diisi!!!")
+    private String accountId;
+
     @NotBlank(message = "Tipe laundry wajib diisi!!!")
     @Enumerated(EnumType.STRING)
     private String type;

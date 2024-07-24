@@ -1,21 +1,30 @@
 package com.gruptiga.smartlaundry.service.impl;
 
-import com.gruptiga.smartlaundry.constant.Detail;
 import com.gruptiga.smartlaundry.constant.Payment;
 import com.gruptiga.smartlaundry.constant.Status;
+import com.gruptiga.smartlaundry.dto.request.SearchTransactionRequest;
+import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.request.TransactionRequest;
-import com.gruptiga.smartlaundry.dto.response.TransactionDetailResponse;
 import com.gruptiga.smartlaundry.dto.response.TransactionResponse;
 import com.gruptiga.smartlaundry.entity.*;
 import com.gruptiga.smartlaundry.repository.TransactionRepository;
 import com.gruptiga.smartlaundry.service.*;
+import com.gruptiga.smartlaundry.specification.TransactionSpecifications;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -32,9 +41,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final CustomerService customerService;
 
-    private final AccountService accountService;
-
-    private final TransactionDetailService transactionDetailService;
+//    private final TransactionDetailService transactionDetailService;
 
     private final ServiceTypeService typeService;
 
@@ -47,79 +54,38 @@ public class TransactionServiceImpl implements TransactionService {
 
         Customer customer = customerService.getById(request.getCustomerId());
 
-        Account account = accountService.getById(request.getAccountId());
+        ServiceType serviceType = typeService.getById(request.getServiceTypeId());
+
+        // Convert Tanggal
+        Date dateNow = new Date();
+
+        Instant instant = dateNow.toInstant();
+
+        LocalDate localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
 
         // Buat objek transaksi
 
         Transaction trx = Transaction.builder()
                 .customer(customer)
-                .account(account)
+                .serviceType(serviceType)
                 .status(Status.ONGOING)
-                .totalPrice(parseLong("0"))
+                .qty(request.getQty())
+                .totalPrice(serviceType.getPrice() * request.getQty())
                 .payment(Payment.valueOf(request.getPayment()))
-                .orderDate(new Date())
+                .orderDate(localDate)
                 .build();
 
         // Simpan transaksi di database
 
         Transaction savedTransaction = transactionRepository.save(trx);
 
-        // Membuat daftar detail dari transaksi
-
-        List<TransactionDetail> trxDetail = request.getTransactionDetails().stream()
-                .map(detailRequest -> {
-
-                    // Informasi quantity pada terminal Intellij
-                    log.info("Kuantitas dalam order ini sejumlah  : {}", detailRequest.getQty());
-
-                    // Pemilihan pelayanan laundry
-
-                    ServiceType serviceType = typeService.getById(detailRequest.getServiceTypeId());
-
-                    // Mengembalikan nilai objek transaksi detail
-
-                    return TransactionDetail.builder()
-                            .trx(savedTransaction)
-                            .serviceType(serviceType)
-                            .qty(detailRequest.getQty())
-                            .price(serviceType.getPrice() * detailRequest.getQty())
-                            .build();
-
-                }).toList();
-
-        // simpan transaksi detail di database
-
-        transactionDetailService.createBulk(trxDetail);
-        savedTransaction.setTransactionDetailList(trxDetail);
-
-        // Menjumlahkan harga total
-
-        AtomicLong totalPrices = new AtomicLong();
-
-        // Logic untuk mendapatkan Array yang berisi harga setiap transaksi detail
-
-        trxDetail.forEach(detail -> totalPrices.addAndGet(detail.getPrice()));
-
-        // Membuat respons dari transaksi detail dengan dikumpulin di metode stream map
-
-        List<TransactionDetailResponse> trxDetailResponse = trxDetail.stream().map(
-                detail -> {
-                    return TransactionDetailResponse.builder()
-                            .trxDetailId(detail.getTrxDetailId())
-                            .serviceTypeId(detail.getServiceType().getServiceTypeId())
-                            .qty(detail.getQty())
-                            .price(detail.getPrice())
-                            .build();
-                }
-        ).toList();
-
         return TransactionResponse.builder()
                 .trxId(savedTransaction.getTrxId())
                 .customerId(savedTransaction.getCustomer().getCustomerId())
-                .accountId(savedTransaction.getAccount().getAccountId())
+                .serviceTypeId(savedTransaction.getServiceType().getServiceTypeId())
                 .status(savedTransaction.getStatus().toString())
-                .transactionDetailList(savedTransaction.getTransactionDetailList())
-                .totalPrice(totalPrices.get())
+                .qty(savedTransaction.getQty())
+                .totalPrice(savedTransaction.getTotalPrice())
                 .payment(savedTransaction.getPayment().toString())
                 .orderDate(savedTransaction.getOrderDate())
                 .build();
@@ -131,29 +97,42 @@ public class TransactionServiceImpl implements TransactionService {
         // Memanggil repository findAll terlebih dahulu
         List<Transaction> transactions = transactionRepository.findAll();
 
-        return transactions.stream().map(trx -> {
-            List<TransactionDetailResponse> trxDetailResponse = trx.getTransactionDetailList().stream().map(trxDetail -> {
-                return TransactionDetailResponse.builder()
-                        .trxDetailId(trxDetail.getTrxDetailId())
-                        .serviceTypeId(trxDetail.getServiceType().getServiceTypeId())
-                        .qty(trxDetail.getQty())
-                        .price(trxDetail.getPrice())
-                        .build();
-            }).toList();
+//        return transactions.stream().map(trx -> {
+//            List<TransactionDetailResponse> trxDetailResponse = trx.getTransactionDetailList().stream().map(trxDetail -> {
+//                return TransactionDetailResponse.builder()
+//                        .trxDetailId(trxDetail.getTrxDetailId())
+//                        .serviceTypeId(trxDetail.getServiceType().getServiceTypeId())
+//                        .qty(trxDetail.getQty())
+//                        .price(trxDetail.getPrice())
+//                        .build();
+//            }).toList();
+//
+//            AtomicLong totalPrices = new AtomicLong();
+//
+//            // Logic untuk mendapatkan Array yang berisi harga setiap transaksi detail
+//
+//            trxDetailResponse.forEach(detail -> totalPrices.addAndGet(detail.getPrice()));
+//
+//            return TransactionResponse.builder()
+//                    .trxId(trx.getTrxId())
+//                    .customerId(trx.getCustomer().getCustomerId())
+//                    .accountId(trx.getAccount().getAccountId())
+//                    .status(trx.getStatus().toString())
+//                    .transactionDetailList(trx.getTransactionDetailList())
+//                    .totalPrice(totalPrices.get())
+//                    .payment(trx.getPayment().toString())
+//                    .orderDate(trx.getOrderDate())
+//                    .build();
+//        }).toList();
 
-            AtomicLong totalPrices = new AtomicLong();
-
-            // Logic untuk mendapatkan Array yang berisi harga setiap transaksi detail
-
-            trxDetailResponse.forEach(detail -> totalPrices.addAndGet(detail.getPrice()));
-
+        return transactions.stream().map(trx ->{
             return TransactionResponse.builder()
                     .trxId(trx.getTrxId())
                     .customerId(trx.getCustomer().getCustomerId())
-                    .accountId(trx.getAccount().getAccountId())
+                    .serviceTypeId(trx.getServiceType().getServiceTypeId())
                     .status(trx.getStatus().toString())
-                    .transactionDetailList(trx.getTransactionDetailList())
-                    .totalPrice(totalPrices.get())
+                    .qty(trx.getQty())
+                    .totalPrice(trx.getTotalPrice())
                     .payment(trx.getPayment().toString())
                     .orderDate(trx.getOrderDate())
                     .build();
@@ -173,6 +152,24 @@ public class TransactionServiceImpl implements TransactionService {
         return parseTransactionToTransactionResponse(trx);
     }
 
+    @Override
+    public List<TransactionResponse> getByDateAndAccount(String date, String accountId) {
+        return List.of();
+    }
+
+    @Override
+    public List<TransactionResponse> getAllTransactionsBaru(SearchTransactionRequest request) {
+        Specification<Transaction> specification = TransactionSpecifications.getSpecification(request);
+        if(request.getOrderDate() == null && request.getStatus() == null){
+            return transactionRepository.findAll().stream().map(this::parseTransactionToTransactionResponse).toList();
+        } else {
+            return transactionRepository.findAll(specification).stream().map(
+                    this::parseTransactionToTransactionResponse
+            ).toList();
+        }
+
+    }
+
     private TransactionResponse parseTransactionToTransactionResponse(Transaction trx) {
         String id;
         if (trx.getTrxId() == null){
@@ -184,13 +181,14 @@ public class TransactionServiceImpl implements TransactionService {
         return TransactionResponse.builder()
                 .trxId(id)
                 .customerId(trx.getCustomer().getCustomerId())
-                .accountId(trx.getAccount().getAccountId())
+                .serviceTypeId(trx.getServiceType().getServiceTypeId())
                 .status(trx.getStatus().toString())
-                .transactionDetailList(trx.getTransactionDetailList())
+                .qty(trx.getQty())
                 .totalPrice(trx.getTotalPrice())
                 .payment(trx.getPayment().toString())
                 .orderDate(trx.getOrderDate())
                 .build();
         // buat get by tanggal dan akun untuk transaksi
+
     }
 }

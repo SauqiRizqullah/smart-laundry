@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -31,16 +32,15 @@ public class Transaction {
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name = "account_id")
-    private Account account;
+    @JoinColumn(name = "service_type_id")
+    private ServiceType serviceType;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Status status; //enum
 
-    @OneToMany(mappedBy = "trx")
-    @JsonManagedReference
-    private List<TransactionDetail> transactionDetailList;
+    @Column(name = "qty")
+    private Integer qty;
 
     @Column(name = "total_price")
     private Long totalPrice;
@@ -49,6 +49,7 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private Payment payment; //enum
 
-    @Column(name = "orderDate")
-    private Date orderDate;
+    @Column(name = "order_date")
+    private LocalDate orderDate;
+
 }

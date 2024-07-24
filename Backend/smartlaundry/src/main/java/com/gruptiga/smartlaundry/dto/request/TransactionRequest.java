@@ -12,9 +12,9 @@ import java.util.List;
 public class TransactionRequest {
     private String customerId;
 
-    private String accountId;
+    private String serviceTypeId;
 
-    private List<TransactionDetailRequest> transactionDetails;
+    private Integer qty;
 
     private String payment;
 

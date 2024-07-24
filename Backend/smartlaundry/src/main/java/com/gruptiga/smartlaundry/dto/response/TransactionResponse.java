@@ -1,10 +1,11 @@
 package com.gruptiga.smartlaundry.dto.response;
 
-import com.gruptiga.smartlaundry.entity.TransactionDetail;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -16,15 +17,15 @@ public class TransactionResponse {
 
     private String customerId;
 
-    private String accountId;
+    private String serviceTypeId;
 
     private String status;
 
-    private List<TransactionDetail> transactionDetailList;
+    private Integer qty;
 
     private Long totalPrice;
 
     private String payment;
 
-    private Date orderDate;
+    private LocalDate orderDate;
 }
