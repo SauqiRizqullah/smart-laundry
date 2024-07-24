@@ -40,12 +40,16 @@ public class TransactionController {
     @GetMapping(produces = "application/json")
     public List<TransactionResponse> getAllTransactionsBaru (
             @RequestParam(name = "orderDate", required = false) @JsonFormat(pattern = "yyyy-MM-dd") String orderDate,
-            @RequestParam(name = "status",required = false) String status
+            @RequestParam(name = "status",required = false) String status,
+            @RequestParam(name = "minDate", required = false) @JsonFormat(pattern = "yyyy-MM-dd") String minDate,
+            @RequestParam(name = "maxDate", required = false) @JsonFormat(pattern = "yyyy-MM-dd") String maxDate
     )
     {
         SearchTransactionRequest searchTransactionRequest = SearchTransactionRequest.builder()
                 .orderDate(orderDate)
                 .status(status)
+                .minDate(minDate)
+                .maxDate(maxDate)
                 .build();
        return transactionService.getAllTransactionsBaru(searchTransactionRequest);
 

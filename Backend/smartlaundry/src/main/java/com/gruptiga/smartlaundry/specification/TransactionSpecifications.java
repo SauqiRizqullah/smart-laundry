@@ -18,6 +18,8 @@ public class TransactionSpecifications {
 
             List<Predicate> predicates = new ArrayList<>();
             if (request.getOrderDate() != null) {
+                request.setMinDate(null);
+                request.setMaxDate(null);
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 //                    Date orderDate = formatter.parse(request.getOrderDate());
@@ -28,6 +30,19 @@ public class TransactionSpecifications {
             } if (request.getStatus() != null) {
                 Predicate  statusPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("status")), "%" + request.getStatus().toLowerCase() + "%");
                 predicates.add(statusPredicate);
+            }
+            if (request.getMinDate() != null) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate minDate = LocalDate.parse(request.getMinDate(), formatter);
+                Predicate minDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get("orderDate"), minDate);
+                predicates.add(minDatePredicate);
+            }
+
+            if (request.getMaxDate() != null) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate maxDate = LocalDate.parse(request.getMaxDate(), formatter);
+                Predicate maxDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get("orderDate"), maxDate);
+                predicates.add(maxDatePredicate);
             }
 
             return query.where(predicates.toArray(new Predicate[]{})).getRestriction();

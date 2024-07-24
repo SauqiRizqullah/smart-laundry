@@ -11,4 +11,8 @@ public class SearchTransactionRequest {
     private String orderDate;
 
     private String status;
+
+    private String minDate;
+
+    private String maxDate;
 }
