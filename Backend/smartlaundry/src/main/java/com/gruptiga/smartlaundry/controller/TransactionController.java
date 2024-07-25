@@ -20,9 +20,10 @@ public class TransactionController {
 
     @PostMapping(produces = "application/json")
     public TransactionResponse createNewTransaction (
-            @RequestBody TransactionRequest transactionRequest
+            @RequestBody TransactionRequest transactionRequest,
+            @RequestParam String email
     ){
-        return transactionService.createNewTransaction(transactionRequest);
+        return transactionService.createNewTransaction(transactionRequest, email);
     }
 
 //    @GetMapping(produces = "application/json")

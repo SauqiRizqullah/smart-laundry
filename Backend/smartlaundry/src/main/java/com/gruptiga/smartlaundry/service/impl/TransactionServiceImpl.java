@@ -39,22 +39,17 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
 
-    private final CustomerService customerService;
-
-//    private final TransactionDetailService transactionDetailService;
-
-    private final ServiceTypeService typeService;
+    private final AccountService accountService;
 
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public TransactionResponse createNewTransaction(TransactionRequest request) {
+    public TransactionResponse createNewTransaction(TransactionRequest request, String email) {
 
         // cari objek yang sudah ada
 
-        Customer customer = customerService.getById(request.getCustomerId());
+        Account accountss = accountService.getByEmail(email);
 
-        ServiceType serviceType = typeService.getById(request.getServiceTypeId());
 
         // Convert Tanggal
         Date dateNow = new Date();
@@ -66,19 +61,26 @@ public class TransactionServiceImpl implements TransactionService {
         // Buat objek transaksi
 
         Transaction trx = Transaction.builder()
-                .status(Status.ONGOING)
+                .account(accountss)
+                .customerId(request.getCustomersId())
+                .serviceTypeId(request.getServiceTypeId())
+                .status(Status.ANTRIAN)
                 .qty(request.getQty())
-                .totalPrice(serviceType.getPrice() * request.getQty())
+                .totalPrice(Long.valueOf(request.getServicePrice() * request.getQty()))
                 .payment(Payment.valueOf(request.getPayment()))
                 .orderDate(localDate)
                 .build();
+
 
         // Simpan transaksi di database
 
         Transaction savedTransaction = transactionRepository.save(trx);
 
         return TransactionResponse.builder()
+                .accountId(savedTransaction.getAccount().getAccountId())
                 .trxId(savedTransaction.getTrxId())
+                .customerId(savedTransaction.getCustomerId())
+                .serviceTypeId(savedTransaction.getServiceTypeId())
                 .status(savedTransaction.getStatus().toString())
                 .qty(savedTransaction.getQty())
                 .totalPrice(savedTransaction.getTotalPrice())
@@ -138,7 +140,7 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionResponse updateStatusDone(String id) {
         Transaction trx = transactionRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Id transaksi tidak ditemukan!!!"));
 
-        trx.setStatus(Status.DONE);
+        trx.setStatus(Status.SELESAI);
 
 //        transactionRepository.updateStatusById(id, newStatus);
         transactionRepository.save(trx);

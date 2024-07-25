@@ -1,7 +1,6 @@
 package com.gruptiga.smartlaundry.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gruptiga.smartlaundry.constant.ConstantTable;
 import com.gruptiga.smartlaundry.constant.Payment;
 import com.gruptiga.smartlaundry.constant.Status;
@@ -10,8 +9,6 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 
 @Setter
 @Getter
@@ -19,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "transactions")
+@Table(name = ConstantTable.TRANSACTION)
 public class Transaction {
 
     @Id
@@ -28,9 +25,10 @@ public class Transaction {
     @Column(name = "trx_id")
     private String trxId;
 
-    @ManyToMany(mappedBy = "transactions")
+    @ManyToOne
+    @JoinColumn(name = "account_id")
     @JsonBackReference
-    private List<Account> accounts;
+    private Account account;
 
     @Column(name = "customer_id")
     private String customerId;

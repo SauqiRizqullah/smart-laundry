@@ -3,10 +3,15 @@ package com.gruptiga.smartlaundry.service.impl;
 import com.gruptiga.smartlaundry.dto.request.CustomerRequest;
 import com.gruptiga.smartlaundry.dto.request.SearchCustomerRequest;
 import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
+import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.entity.Customer;
+import com.gruptiga.smartlaundry.repository.AccountRepository;
 import com.gruptiga.smartlaundry.repository.CustomerRepository;
+import com.gruptiga.smartlaundry.service.AccountService;
 import com.gruptiga.smartlaundry.service.CustomerService;
 import com.gruptiga.smartlaundry.specification.CustomerSpecification;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -20,13 +25,17 @@ import java.util.List;
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
+    private final AccountService accountService;
 
     @Override
     public CustomerResponse createCustomer(CustomerRequest request) {
+        Account account = accountService.getById(request.getAccountId());
+
         Customer customer = Customer.builder()
                 .name(request.getName())
                 .address(request.getAddress())
                 .phoneNumber(request.getPhoneNumber())
+                .account(account)
                 .build();
 
         customerRepository.saveAndFlush(customer);
@@ -47,6 +56,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .name(customer.getName())
                 .address(customer.getAddress())
                 .phoneNumber(customer.getPhoneNumber())
+                .accountId(customer.getAccount().getAccountId())
                 .build();
     }
 

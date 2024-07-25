@@ -1,5 +1,6 @@
 package com.gruptiga.smartlaundry.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gruptiga.smartlaundry.constant.ConstantTable;
 import com.gruptiga.smartlaundry.constant.Detail;
 import com.gruptiga.smartlaundry.constant.Type;
@@ -24,6 +25,7 @@ public class ServiceType {
 
     @ManyToOne
     @JoinColumn(name = "account_id")
+    @JsonBackReference
     private Account account;
 
     @Column(name = "type")

@@ -13,6 +13,9 @@ import java.util.List;
 @Setter
 @Builder
 public class TransactionResponse {
+
+    private String accountId;
+
     private String trxId;
 
     private String customerId;

@@ -2,8 +2,12 @@ package com.gruptiga.smartlaundry.service.impl;
 
 import com.gruptiga.smartlaundry.dto.request.AccountRequest;
 import com.gruptiga.smartlaundry.dto.request.SearchAccountRequest;
+import com.gruptiga.smartlaundry.dto.request.SearchCustomerRequest;
 import com.gruptiga.smartlaundry.dto.response.AccountResponse;
+import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
 import com.gruptiga.smartlaundry.entity.Account;
+import com.gruptiga.smartlaundry.entity.Customer;
+import com.gruptiga.smartlaundry.entity.ServiceType;
 import com.gruptiga.smartlaundry.entity.Transaction;
 import com.gruptiga.smartlaundry.repository.AccountRepository;
 import com.gruptiga.smartlaundry.service.AccountService;
@@ -80,9 +84,15 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.count();
     }
 
+
+
     @Override
-    public List<Transaction> getTransactionsByAccountEmail(String email) {
-        Account account = getByEmail(email);
-        return account.getTransactions();
+    public List<Customer> getCustomersByEmail(String email) {
+        return accountRepository.findCustomersByAccountEmail(email);
+    }
+
+    @Override
+    public List<ServiceType> getServiceTypesByEmail(String email) {
+        return accountRepository.findServiceTypesByAccountEmail(email);
     }
 }

@@ -33,11 +33,11 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
         Account account = accountService.getById(serviceTypeRequest.getAccountId());
 
         ServiceType serviceType = ServiceType.builder()
-                .account(account)
                 .type(Type.valueOf(serviceTypeRequest.getType()))
                 .service(serviceTypeRequest.getService())
                 .price(serviceTypeRequest.getPrice())
-                .detail(Detail.valueOf(serviceTypeRequest.getDetail()))
+                .detail(Detail.valueOf(serviceTypeRequest.getDetail().toUpperCase()))
+                .account(account)
                 .build();
 
         serviceTypeRepository.saveAndFlush(serviceType);

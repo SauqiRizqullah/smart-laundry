@@ -66,16 +66,28 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(path = "/transactions", produces = "application/json")
-    public ResponseEntity<CommonResponse<List<Transaction>>> getTransactionsByAccountEmail(
-            @RequestParam(name = "email") String email) {
-        List<Transaction> transactions = accountService.getTransactionsByAccountEmail(email);
-        CommonResponse<List<Transaction>> response = CommonResponse.<List<Transaction>>builder()
-                .statusCode(HttpStatus.OK.value())
-                .message("Data transaksi berdasarkan email akun berhasil didapatkan!!!")
-                .data(transactions)
-                .build();
-
-        return ResponseEntity.ok(response);
+    @GetMapping("/customers")
+    public ResponseEntity<List<Customer>> getCustomersByEmail(@RequestParam String email) {
+        List<Customer> customers = accountService.getCustomersByEmail(email);
+        return new ResponseEntity<>(customers, HttpStatus.OK);
     }
+
+    @GetMapping("/serviceTypes")
+    public ResponseEntity<List<ServiceType>> getServiceTypesByEmail(@RequestParam String email) {
+        List<ServiceType> serviceTypes = accountService.getServiceTypesByEmail(email);
+        return new ResponseEntity<>(serviceTypes, HttpStatus.OK);
+    }
+
+//    @GetMapping(path = "/transactions", produces = "application/json")
+//    public ResponseEntity<CommonResponse<List<Transaction>>> getTransactionsByAccountEmail(
+//            @RequestParam(name = "email") String email) {
+//        List<Transaction> transactions = accountService.getTransactionsByAccountEmail(email);
+//        CommonResponse<List<Transaction>> response = CommonResponse.<List<Transaction>>builder()
+//                .statusCode(HttpStatus.OK.value())
+//                .message("Data transaksi berdasarkan email akun berhasil didapatkan!!!")
+//                .data(transactions)
+//                .build();
+//
+//        return ResponseEntity.ok(response);
+//    }
 }

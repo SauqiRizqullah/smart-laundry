@@ -1,6 +1,8 @@
 package com.gruptiga.smartlaundry.constant;
 
 public enum Status {
-    ONGOING,
-    DONE
+    ANTRIAN,
+    SEDANG_DICUCI,
+    SELESAI
 }
+

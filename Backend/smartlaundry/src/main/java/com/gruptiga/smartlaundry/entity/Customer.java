@@ -1,5 +1,6 @@
 package com.gruptiga.smartlaundry.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gruptiga.smartlaundry.constant.ConstantTable;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,5 +32,6 @@ public class Customer {
 
     @ManyToOne
     @JoinColumn(name = "account_id")
+    @JsonBackReference
     private Account account;
 }

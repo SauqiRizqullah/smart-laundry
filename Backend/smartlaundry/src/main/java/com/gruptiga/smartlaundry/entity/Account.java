@@ -42,14 +42,17 @@ public class Account implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @ManyToMany
-    @JoinTable(
-            name = "account_transactions",
-            joinColumns = @JoinColumn(name = "account_id"),
-            inverseJoinColumns = @JoinColumn(name = "trx_id")
-    )
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Transaction> transactions;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<ServiceType> serviceTypes;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Customer> customers;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
