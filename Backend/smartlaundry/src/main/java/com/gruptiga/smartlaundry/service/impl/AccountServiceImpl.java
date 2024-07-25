@@ -3,13 +3,11 @@ package com.gruptiga.smartlaundry.service.impl;
 import com.gruptiga.smartlaundry.dto.request.AccountRequest;
 import com.gruptiga.smartlaundry.dto.request.SearchAccountRequest;
 import com.gruptiga.smartlaundry.dto.response.AccountResponse;
-import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
 import com.gruptiga.smartlaundry.entity.Account;
-import com.gruptiga.smartlaundry.entity.Customer;
+import com.gruptiga.smartlaundry.entity.Transaction;
 import com.gruptiga.smartlaundry.repository.AccountRepository;
 import com.gruptiga.smartlaundry.service.AccountService;
 import com.gruptiga.smartlaundry.specification.AccountSpecification;
-import com.gruptiga.smartlaundry.specification.CustomerSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -26,8 +24,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountResponse createAccount(AccountRequest accountRequest) {
-        Account account = Account
-                .builder()
+        Account account = Account.builder()
                 .name(accountRequest.getName())
                 .address(accountRequest.getAddress())
                 .contact(accountRequest.getContact())
@@ -41,12 +38,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private AccountResponse parseAccountToAccountResponse(Account account) {
-        String id;
-        if (account.getAccountId() == null) {
-            id = null;
-        } else {
-            id = account.getAccountId();
-        }
+        String id = account.getAccountId() == null ? null : account.getAccountId();
 
         return AccountResponse.builder()
                 .accountId(id)
@@ -57,25 +49,40 @@ public class AccountServiceImpl implements AccountService {
                 .build();
     }
 
-
     @Override
     public Account getById(String accountId) {
-        Account account = accountRepository.findById(accountId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id Customer tidak ditemukan!!!"));
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id Account tidak ditemukan!!!"));
+    }
 
-        return account;
+    @Override
+    public Account getByEmail(String email) {
+        return accountRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Email Account tidak ditemukan!!!"));
     }
 
     @Override
     public List<AccountResponse> getAllAccounts(SearchAccountRequest accountRequest) {
         Specification<Account> accountSpecification = AccountSpecification.getSpecification(accountRequest);
-        if (accountRequest.getName() == null){
-            return accountRepository.findAll().stream().map(this::parseAccountToAccountResponse).toList();
-        } else
-            return accountRepository.findAll(accountSpecification).stream().map(this::parseAccountToAccountResponse).toList();
+        if (accountRequest.getName() == null) {
+            return accountRepository.findAll().stream()
+                    .map(this::parseAccountToAccountResponse)
+                    .toList();
+        } else {
+            return accountRepository.findAll(accountSpecification).stream()
+                    .map(this::parseAccountToAccountResponse)
+                    .toList();
+        }
     }
 
     @Override
     public long count() {
         return accountRepository.count();
+    }
+
+    @Override
+    public List<Transaction> getTransactionsByAccountEmail(String email) {
+        Account account = getByEmail(email);
+        return account.getTransactions();
     }
 }

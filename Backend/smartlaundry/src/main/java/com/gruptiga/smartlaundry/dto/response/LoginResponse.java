@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class LoginResponse {
-    private String name;
+    private String email;
     private String token;
 }
 

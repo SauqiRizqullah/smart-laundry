@@ -79,4 +79,9 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.delete(customer);
         return parseCustomerToCustomerResponse(customer);
     }
+
+    @Override
+    public long count() {
+        return customerRepository.count();
+    }
 }

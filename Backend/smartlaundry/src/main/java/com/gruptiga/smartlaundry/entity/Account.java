@@ -1,5 +1,6 @@
 package com.gruptiga.smartlaundry.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gruptiga.smartlaundry.constant.ConstantTable;
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,9 +10,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
-@Getter
 @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -40,21 +42,29 @@ public class Account implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @ManyToMany
+    @JoinTable(
+            name = "account_transactions",
+            joinColumns = @JoinColumn(name = "account_id"),
+            inverseJoinColumns = @JoinColumn(name = "trx_id")
+    )
+    @JsonManagedReference
+    private List<Transaction> transactions;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
     }
 
     @Override
-    public String getPassword(){
+    public String getPassword() {
         return password;
     }
 
     @Override
-    public String getUsername(){
+    public String getUsername() {
         return email;
     }
-
 
     @Override
     public boolean isAccountNonExpired() {
@@ -76,3 +86,5 @@ public class Account implements UserDetails {
         return true;
     }
 }
+
+

@@ -1,11 +1,12 @@
 package com.gruptiga.smartlaundry.dto.response;
 
+import com.gruptiga.smartlaundry.entity.Account;
 import lombok.*;
 
 @Getter
 @Setter
 @Builder
-public class AccountResponse {
+public class AccountResponse  {
     private String accountId;
 
     private String name;

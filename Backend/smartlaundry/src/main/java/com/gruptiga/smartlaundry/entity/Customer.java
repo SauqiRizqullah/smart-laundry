@@ -28,4 +28,8 @@ public class Customer {
 
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
 }

@@ -17,4 +17,6 @@ public interface CustomerService {
     CustomerResponse updateCustomer (Customer customer);
 
     CustomerResponse deleteById(String customerId);
+
+    long count();
 }

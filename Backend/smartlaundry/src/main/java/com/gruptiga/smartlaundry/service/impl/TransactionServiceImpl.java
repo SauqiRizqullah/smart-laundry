@@ -66,8 +66,6 @@ public class TransactionServiceImpl implements TransactionService {
         // Buat objek transaksi
 
         Transaction trx = Transaction.builder()
-                .customer(customer)
-                .serviceType(serviceType)
                 .status(Status.ONGOING)
                 .qty(request.getQty())
                 .totalPrice(serviceType.getPrice() * request.getQty())
@@ -81,8 +79,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         return TransactionResponse.builder()
                 .trxId(savedTransaction.getTrxId())
-                .customerId(savedTransaction.getCustomer().getCustomerId())
-                .serviceTypeId(savedTransaction.getServiceType().getServiceTypeId())
                 .status(savedTransaction.getStatus().toString())
                 .qty(savedTransaction.getQty())
                 .totalPrice(savedTransaction.getTotalPrice())
@@ -128,8 +124,6 @@ public class TransactionServiceImpl implements TransactionService {
         return transactions.stream().map(trx ->{
             return TransactionResponse.builder()
                     .trxId(trx.getTrxId())
-                    .customerId(trx.getCustomer().getCustomerId())
-                    .serviceTypeId(trx.getServiceType().getServiceTypeId())
                     .status(trx.getStatus().toString())
                     .qty(trx.getQty())
                     .totalPrice(trx.getTotalPrice())
@@ -180,8 +174,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         return TransactionResponse.builder()
                 .trxId(id)
-                .customerId(trx.getCustomer().getCustomerId())
-                .serviceTypeId(trx.getServiceType().getServiceTypeId())
                 .status(trx.getStatus().toString())
                 .qty(trx.getQty())
                 .totalPrice(trx.getTotalPrice())

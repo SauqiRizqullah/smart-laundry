@@ -1,10 +1,15 @@
 package com.gruptiga.smartlaundry.repository;
 
 import com.gruptiga.smartlaundry.entity.Account;
+import com.gruptiga.smartlaundry.entity.Customer;
+import com.gruptiga.smartlaundry.entity.ServiceType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -13,5 +18,9 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, String>, JpaSpecificationExecutor<Account> {
     Optional<Account> findByEmail(String email);
 
+    @Query("SELECT c FROM Customer c WHERE c.account.email = :email")
+    List<Customer> findCustomersByAccountEmail(@Param("email") String email);
 
+    @Query("SELECT s FROM ServiceType s WHERE s.account.email = :email")
+    List<ServiceType> findServiceTypesByAccountEmail(@Param("email") String email);
 }

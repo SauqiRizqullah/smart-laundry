@@ -90,7 +90,7 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtService.generateToken(userAccount);
         return LoginResponse.builder()
                 .token(token)
-                .name(userAccount.getName())
+                .email(userAccount.getEmail())
                 .build();
     }
 }

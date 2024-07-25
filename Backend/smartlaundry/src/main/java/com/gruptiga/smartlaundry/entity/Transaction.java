@@ -1,5 +1,6 @@
 package com.gruptiga.smartlaundry.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gruptiga.smartlaundry.constant.ConstantTable;
 import com.gruptiga.smartlaundry.constant.Payment;
@@ -18,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = ConstantTable.TRANSACTION)
+@Table(name = "transactions")
 public class Transaction {
 
     @Id
@@ -27,13 +28,15 @@ public class Transaction {
     @Column(name = "trx_id")
     private String trxId;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @ManyToMany(mappedBy = "transactions")
+    @JsonBackReference
+    private List<Account> accounts;
 
-    @ManyToOne
-    @JoinColumn(name = "service_type_id")
-    private ServiceType serviceType;
+    @Column(name = "customer_id")
+    private String customerId;
+
+    @Column(name = "service_type_id")
+    private String serviceTypeId;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
@@ -51,5 +54,4 @@ public class Transaction {
 
     @Column(name = "order_date")
     private LocalDate orderDate;
-
 }

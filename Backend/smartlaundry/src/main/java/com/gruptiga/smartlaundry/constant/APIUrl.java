@@ -10,4 +10,7 @@ public class APIUrl {
     public static final String TRANSACTION = "/api/v1/transactions";
     public static final String PATH_VAR_TRANSACTION_ID = "/{trxId}";
     public static final String AUTH_API = "/api/v1/auth";
+    public static final String ACCOUNT_BY_EMAIL = "/by-email";
 }
+
+
