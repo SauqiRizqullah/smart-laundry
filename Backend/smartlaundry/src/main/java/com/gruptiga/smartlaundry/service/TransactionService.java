@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface TransactionService {
 
-    TransactionResponse createNewTransaction (TransactionRequest request, String email);
+    TransactionResponse createNewTransaction (TransactionRequest request);
 
     List<TransactionResponse> getAllTransactions();
 

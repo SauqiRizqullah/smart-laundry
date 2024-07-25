@@ -1,6 +1,8 @@
 package com.gruptiga.smartlaundry.dto.request;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.List;
@@ -11,19 +13,17 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class TransactionRequest {
-    @NotBlank(message = "Service Price wajib diisi!!!")
-    private Integer servicePrice;
-
-    @NotBlank(message = "Service Type ID wajib diisi!!!")
+    @NotBlank(message = "Id pelayanan laundry wajib diisi!!!")
     private String serviceTypeId;
 
-    @NotBlank(message = "Customers ID wajib diisi!!!")
+    @NotBlank(message = "Id customer wajib diisi!!!")
     private String customersId;
 
-    @NotBlank(message = "Qty wajib diisi!!!")
+    @NotNull(message = "Kuantitas dari pelayanan laundry wajib diisi!!!")
+    @Min(value = 1, message = "Masukkan jumlah kuantitas yang benar!!!")
     private Integer qty;
 
-    @NotBlank(message = "Payment wajib diisi!!!")
+    @NotBlank(message = "Metode pembayaran wajib diisi!!!")
     private String payment;
 
 }

@@ -2,6 +2,7 @@ package com.gruptiga.smartlaundry.security;
 
 import com.gruptiga.smartlaundry.dto.response.JwtClaims;
 import com.gruptiga.smartlaundry.entity.Account;
+import com.gruptiga.smartlaundry.repository.TokenRepository;
 import com.gruptiga.smartlaundry.service.JwtService;
 import com.gruptiga.smartlaundry.service.UserService;
 import jakarta.servlet.FilterChain;
@@ -25,6 +26,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     final String AUTH_HEADER = "Authorization";
     private final JwtService jwtService;
     private final UserService userService;
+    private final TokenRepository tokenRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -32,12 +34,18 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             String bearerToken = request.getHeader(AUTH_HEADER);
 
             // Periksa apakah token diawali dengan kata "Bearer"
-            if(bearerToken != null && bearerToken.startsWith("Bearer ")){
+            if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
                 // Hapus kata "Bearer" dari token
                 String token = bearerToken.substring(7);
 
+                // Periksa apakah token ada dalam daftar token yang diblokir
+                if (tokenRepository.findByToken(token).isPresent()) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
+
                 // verify token
-                if(jwtService.verifyJwtToken(token)){
+                if (jwtService.verifyJwtToken(token)) {
                     // claims token/ decode token
                     JwtClaims decodeJwt = jwtService.getClaimsByToken(token);
 
@@ -57,13 +65,13 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Cannot set user authentication: {}", e.getMessage());
         }
 
         // ibarat finally
         // Lempar ke controller
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 }
 

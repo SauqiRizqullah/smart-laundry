@@ -9,6 +9,7 @@ import com.gruptiga.smartlaundry.repository.AccountRepository;
 import com.gruptiga.smartlaundry.repository.CustomerRepository;
 import com.gruptiga.smartlaundry.service.AccountService;
 import com.gruptiga.smartlaundry.service.CustomerService;
+import com.gruptiga.smartlaundry.service.UserService;
 import com.gruptiga.smartlaundry.specification.CustomerSpecification;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -25,11 +26,15 @@ import java.util.List;
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
-    private final AccountService accountService;
+    private final UserService userService;
 
     @Override
     public CustomerResponse createCustomer(CustomerRequest request) {
-        Account account = accountService.getById(request.getAccountId());
+        Account account = userService.getByContext();
+
+        if (!request.getAccountId().equals(account.getAccountId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Tidak diizinkan membuat data customer untuk akun laundry yang lain.");
+        }
 
         Customer customer = Customer.builder()
                 .name(request.getName())
@@ -62,25 +67,51 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer getById(String customerId) {
-        return customerRepository.findById(customerId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id Customer tidak ditemukan!!!"));
+        Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id Customer tidak ditemukan!!!"));
+
+        Account account = userService.getByContext();
+
+        if(!account.getAccountId().equals(customer.getAccount().getAccountId())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Tidak diizinkan mengambil data customer untuk akun laundry yang lain.");
+        }
+
+        return customer;
     }
 
     @Override
     public List<CustomerResponse> getAllCustomers(SearchCustomerRequest request) {
-        Specification<Customer> customerSpecification = CustomerSpecification.getSpecification(request);
-        if (request.getCustomerName() == null){
-            return customerRepository.findAll().stream().map(this::parseCustomerToCustomerResponse).toList();
-        } else
-            return customerRepository.findAll(customerSpecification).stream().map(this::parseCustomerToCustomerResponse).toList();
+        // Mendapatkan account dari context
+        Account currentAccount = userService.getByContext();
+
+        // Menambahkan filter berdasarkan accountId dari context
+        Specification<Customer> customerSpecification = CustomerSpecification.getSpecification(request)
+                .and((root, query, criteriaBuilder) ->
+                        criteriaBuilder.equal(root.get("account").get("accountId"), currentAccount.getAccountId()));
+
+        // Mencari customer berdasarkan filter yang telah ditentukan
+        List<Customer> customers = customerRepository.findAll(customerSpecification);
+
+        // Mengonversi hasil menjadi CustomerResponse
+        return customers.stream().map(this::parseCustomerToCustomerResponse).toList();
     }
 
     @Override
     public CustomerResponse updateCustomer(Customer customer) {
-        customerRepository.findById(customer.getCustomerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id Customer tidak ditemukan!!!"));
+        Account currentAccount = userService.getByContext();
 
-        customerRepository.saveAndFlush(customer);
+        // Menemukan customer berdasarkan ID dan memastikan accountId sesuai dengan context
+        Customer existingCustomer = customerRepository.findById(customer.getCustomerId())
+                .filter(cust -> cust.getAccount().getAccountId().equals(currentAccount.getAccountId()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id Customer tidak ditemukan atau tidak memiliki akses!!!"));
 
-        return parseCustomerToCustomerResponse(customer);
+        // Update data customer
+        existingCustomer.setName(customer.getName());
+        existingCustomer.setAddress(customer.getAddress());
+        existingCustomer.setPhoneNumber(customer.getPhoneNumber());
+
+        customerRepository.saveAndFlush(existingCustomer);
+
+        return parseCustomerToCustomerResponse(existingCustomer);
     }
 
     @Override

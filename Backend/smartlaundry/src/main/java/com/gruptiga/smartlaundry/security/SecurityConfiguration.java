@@ -19,6 +19,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 @EnableMethodSecurity
 public class SecurityConfiguration {
     private final AuthenticationFilter authenticationFilter;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -39,8 +40,11 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(req -> req
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/security/currentuser").permitAll()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .accessDeniedHandler(accessDeniedHandler))
                 // menambahkan filter dari AuthenticationFilter
                 .addFilterBefore(
                         authenticationFilter,

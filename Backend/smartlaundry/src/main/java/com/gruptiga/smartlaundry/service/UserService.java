@@ -7,5 +7,7 @@ public interface UserService extends UserDetailsService {
     Account getByUserId(String id);
 
     Account getByContext();
+
+    void logout();
 }
 

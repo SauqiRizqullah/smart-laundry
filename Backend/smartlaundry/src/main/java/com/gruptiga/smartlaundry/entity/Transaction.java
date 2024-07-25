@@ -30,11 +30,13 @@ public class Transaction {
     @JsonBackReference
     private Account account;
 
-    @Column(name = "customer_id")
-    private String customerId;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
-    @Column(name = "service_type_id")
-    private String serviceTypeId;
+    @ManyToOne
+    @JoinColumn(name = "service_type_id")
+    private ServiceType serviceType;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
