@@ -13,7 +13,7 @@ import lombok.*;
 public class ServiceTypeRequest {
 
     @NotBlank(message = "Id akun laundry wajib diisi!!!")
-    private String accountId;
+    private String email;
 
     @NotBlank(message = "Tipe laundry wajib diisi!!!")
     @Enumerated(EnumType.STRING)

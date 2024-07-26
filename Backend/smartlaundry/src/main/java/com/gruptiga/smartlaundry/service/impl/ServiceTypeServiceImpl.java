@@ -11,7 +11,9 @@ import com.gruptiga.smartlaundry.repository.ServiceTypeRepository;
 import com.gruptiga.smartlaundry.service.AccountService;
 import com.gruptiga.smartlaundry.service.ServiceTypeService;
 import com.gruptiga.smartlaundry.specification.ServiceTypeSpecification;
+import com.gruptiga.smartlaundry.validation.ServiceTypeValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -26,11 +28,14 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
 
     private final AccountService accountService;
 
+    @Autowired
+    ServiceTypeValidator serviceTypeValidator;
+
 
     @Override
     public ServiceTypeResponse createServiceType(ServiceTypeRequest serviceTypeRequest) {
-
-        Account account = accountService.getById(serviceTypeRequest.getAccountId());
+        serviceTypeValidator.validateCreateServiceTypeRequest(serviceTypeRequest);
+        Account account = accountService.getByEmail(serviceTypeRequest.getEmail());
 
         ServiceType serviceType = ServiceType.builder()
                 .type(Type.valueOf(serviceTypeRequest.getType()))
