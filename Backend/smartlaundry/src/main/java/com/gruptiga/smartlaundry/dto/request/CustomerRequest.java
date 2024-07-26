@@ -21,6 +21,6 @@ public class CustomerRequest {
     @Pattern(regexp = "^08\\d{9,11}$", message = "Mobile phone number's pattern must be started by 08 and has 9 until 12 digits")
     private String phoneNumber;
 
-    @NotBlank(message = "Id akun laundry harus diisi!!!")
-    private String accountId;
+    @NotBlank(message = "email akun laundry harus diisi!!!")
+    private String emailAccount;
 }

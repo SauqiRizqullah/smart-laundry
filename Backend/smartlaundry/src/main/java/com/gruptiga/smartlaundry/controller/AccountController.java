@@ -79,8 +79,8 @@ public class AccountController {
         return new ResponseEntity<>(serviceTypes, HttpStatus.OK);
     }
 
-    @PutMapping("/update/{email}")
-    public ResponseEntity<String> updateAccount(@PathVariable String email, @RequestBody AccountRequest request) {
+    @PutMapping("/update")
+    public ResponseEntity<String> updateAccount(@RequestParam String email, @RequestBody AccountRequest request) {
         try {
             accountService.updateAccount(email, request);
             return new ResponseEntity<>("Account updated successfully", HttpStatus.OK);

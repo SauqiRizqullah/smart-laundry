@@ -10,12 +10,16 @@ import com.gruptiga.smartlaundry.repository.CustomerRepository;
 import com.gruptiga.smartlaundry.service.AccountService;
 import com.gruptiga.smartlaundry.service.CustomerService;
 import com.gruptiga.smartlaundry.specification.CustomerSpecification;
+import com.gruptiga.smartlaundry.validation.CustomerValidator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -27,9 +31,16 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final AccountService accountService;
 
+    @Autowired
+    private CustomerValidator customerValidator;
+
     @Override
-    public CustomerResponse createCustomer(CustomerRequest request) {
-        Account account = accountService.getById(request.getAccountId());
+    @Transactional
+    public CustomerResponse createCustomer(@Valid CustomerRequest request) {
+        customerValidator.validateCustomerRequest(request);
+        customerValidator.validateDuplicateCustomer(request);
+
+        Account account = accountService.getByEmail(request.getEmailAccount());
 
         Customer customer = Customer.builder()
                 .name(request.getName())
@@ -43,20 +54,27 @@ public class CustomerServiceImpl implements CustomerService {
         return parseCustomerToCustomerResponse(customer);
     }
 
+    @Override
+    @Transactional
+    public CustomerResponse updateCustomer(@Valid Customer customer) {
+        customerValidator.validateUpdateCustomerRequest(customer);
+
+        customerRepository.findById(customer.getCustomerId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer ID not found"));
+
+        customerRepository.saveAndFlush(customer);
+
+        return parseCustomerToCustomerResponse(customer);
+    }
+
     private CustomerResponse parseCustomerToCustomerResponse(Customer customer) {
-        String id;
-        if (customer.getCustomerId() == null) {
-            id = null;
-        } else {
-            id = customer.getCustomerId();
-        }
+        String id = customer.getCustomerId() == null ? null : customer.getCustomerId();
 
         return CustomerResponse.builder()
                 .customerId(id)
                 .name(customer.getName())
                 .address(customer.getAddress())
                 .phoneNumber(customer.getPhoneNumber())
-                .accountId(customer.getAccount().getAccountId())
                 .build();
     }
 
@@ -74,14 +92,7 @@ public class CustomerServiceImpl implements CustomerService {
             return customerRepository.findAll(customerSpecification).stream().map(this::parseCustomerToCustomerResponse).toList();
     }
 
-    @Override
-    public CustomerResponse updateCustomer(Customer customer) {
-        customerRepository.findById(customer.getCustomerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id Customer tidak ditemukan!!!"));
 
-        customerRepository.saveAndFlush(customer);
-
-        return parseCustomerToCustomerResponse(customer);
-    }
 
     @Override
     public CustomerResponse deleteById(String customerId) {

@@ -1,5 +1,6 @@
 package com.gruptiga.smartlaundry.service.impl;
 
+import com.gruptiga.smartlaundry.constant.EmailPattern;
 import com.gruptiga.smartlaundry.dto.request.AccountRequest;
 import com.gruptiga.smartlaundry.dto.request.SearchAccountRequest;
 import com.gruptiga.smartlaundry.dto.request.SearchCustomerRequest;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Service
@@ -33,8 +35,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountValidator accountValidator;
-    private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@(.+)$";
-    private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
+
 
     @Override
     public AccountResponse createAccount(AccountRequest accountRequest) {
@@ -76,15 +77,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
 
+    @Override
     @Transactional
     public void updateAccount(String email, AccountRequest request) {
         accountValidator.validateAccountRequest(request);
 
-        if (!accountRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Account Tidak ada");
-        }
-
-        if (!accountRepository.existsByEmail(email)) {
+        Optional<Account> existingAccountOptional = accountRepository.findByEmail(email);
+        if (!existingAccountOptional.isPresent()) {
             throw new IllegalArgumentException("Account does not exist");
         }
 
@@ -92,7 +91,7 @@ public class AccountServiceImpl implements AccountService {
             throw new IllegalArgumentException("New email is already taken");
         }
 
-        if (!EMAIL_PATTERN.matcher(request.getEmail()).matches()) {
+        if (!EmailPattern.EMAIL_PATTERN.matcher(request.getEmail()).matches()) {
             throw new IllegalArgumentException("New email format is invalid");
         }
 

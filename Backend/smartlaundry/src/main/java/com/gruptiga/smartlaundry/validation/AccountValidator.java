@@ -1,5 +1,6 @@
 package com.gruptiga.smartlaundry.validation;
 
+import com.gruptiga.smartlaundry.constant.EmailPattern;
 import com.gruptiga.smartlaundry.dto.request.AccountRequest;
 import com.gruptiga.smartlaundry.dto.request.AuthRequest;
 import org.springframework.stereotype.Component;
@@ -9,8 +10,6 @@ import java.util.regex.Pattern;
 @Component
 public class AccountValidator {
 
-    private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@(.+)$";
-    private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
 
     public void validateAccountRequest(AccountRequest request) {
         if (request.getName() == null || request.getName().isEmpty()) {
@@ -28,7 +27,7 @@ public class AccountValidator {
         if (request.getEmail() == null || request.getEmail().isEmpty()) {
             throw new IllegalArgumentException("Email must not be empty");
         }
-        if (!EMAIL_PATTERN.matcher(request.getEmail()).matches()) {
+        if (!EmailPattern.EMAIL_PATTERN.matcher(request.getEmail()).matches()) {
             throw new IllegalArgumentException("Email format is invalid");
         }
     }
@@ -40,7 +39,7 @@ public class AccountValidator {
         if (request.getPassword() == null || request.getPassword().isEmpty()) {
             throw new IllegalArgumentException("Password must not be empty");
         }
-        if (!EMAIL_PATTERN.matcher(request.getEmail()).matches()) {
+        if (!EmailPattern.EMAIL_PATTERN.matcher(request.getEmail()).matches()) {
             throw new IllegalArgumentException("Email format is invalid");
         }
     }

@@ -26,7 +26,14 @@ public interface AccountRepository extends JpaRepository<Account, String>, JpaSp
     List<ServiceType> findServiceTypesByAccountEmail(@Param("email") String email);
 
     boolean existsByEmail(String email);
+
     @Modifying
     @Query("UPDATE Account a SET a.name = :name, a.address = :address, a.contact = :contact, a.password = :password WHERE a.email = :email")
-    void updateAccount(@Param("email") String email, @Param("name") String name, @Param("address") String address, @Param("contact") String contact, @Param("password") String password);
+    void updateAccount(
+            @Param("email") String email,
+            @Param("name") String name,
+            @Param("address") String address,
+            @Param("contact") String contact,
+            @Param("password") String password
+    );
 }

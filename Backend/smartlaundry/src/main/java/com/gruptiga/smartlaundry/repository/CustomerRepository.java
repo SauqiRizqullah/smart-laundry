@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, String>, JpaSpecificationExecutor<Customer> {
-
+    boolean existsByNameAndAddressAndPhoneNumber(String name, String address, String phoneNumber);
 }
