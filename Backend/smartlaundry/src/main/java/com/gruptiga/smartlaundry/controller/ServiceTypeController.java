@@ -4,7 +4,9 @@ import com.gruptiga.smartlaundry.constant.APIUrl;
 import com.gruptiga.smartlaundry.dto.request.SearchServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.response.CommonResponse;
+import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
 import com.gruptiga.smartlaundry.dto.response.ServiceTypeResponse;
+import com.gruptiga.smartlaundry.entity.Customer;
 import com.gruptiga.smartlaundry.entity.ServiceType;
 import com.gruptiga.smartlaundry.service.ServiceTypeService;
 import lombok.RequiredArgsConstructor;
@@ -82,6 +84,21 @@ public class ServiceTypeController {
                 .statusCode(HttpStatus.OK.value())
                 .message("Data pelayanan laundry " + serviceTypeId + " telah dihapus!!!")
                 .data(typeResponse)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping(produces = "application/json")
+    public ResponseEntity<CommonResponse<ServiceTypeResponse>> updateCustomer (
+            @RequestBody ServiceType serviceType
+    ){
+        ServiceTypeResponse updatedServiceType = typeService.updateServiceType(serviceType);
+
+        CommonResponse<ServiceTypeResponse> response = CommonResponse.<ServiceTypeResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Data Service Type " + serviceType.getServiceTypeId() + " telah diperbarui!!!")
+                .data(updatedServiceType)
                 .build();
 
         return ResponseEntity.ok(response);

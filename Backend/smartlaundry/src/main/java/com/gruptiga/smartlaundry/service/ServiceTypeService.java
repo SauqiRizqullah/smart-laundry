@@ -2,7 +2,9 @@ package com.gruptiga.smartlaundry.service;
 
 import com.gruptiga.smartlaundry.dto.request.SearchServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
+import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
 import com.gruptiga.smartlaundry.dto.response.ServiceTypeResponse;
+import com.gruptiga.smartlaundry.entity.Customer;
 import com.gruptiga.smartlaundry.entity.ServiceType;
 
 import java.util.List;
@@ -13,6 +15,7 @@ public interface ServiceTypeService {
 
     List<ServiceTypeResponse> getAllServicesType(SearchServiceTypeRequest serviceTypeRequest);
 
+    ServiceTypeResponse updateServiceType (ServiceType serviceType);
 
 
     long count();

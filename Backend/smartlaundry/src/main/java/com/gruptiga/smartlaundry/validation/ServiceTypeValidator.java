@@ -3,6 +3,7 @@ package com.gruptiga.smartlaundry.validation;
 import com.gruptiga.smartlaundry.constant.Detail;
 import com.gruptiga.smartlaundry.constant.Type;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
+import com.gruptiga.smartlaundry.entity.ServiceType;
 import com.gruptiga.smartlaundry.repository.ServiceTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,6 +56,45 @@ public class ServiceTypeValidator {
         );
         if (exists) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ServiceType with the same type, service, detail, and account already exists");
+        }
+    }
+
+    public void validateUpdateServiceTypeRequest(ServiceType request) {
+        if (request == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request cannot be null");
+        }
+
+        if (request.getServiceTypeId() == null || request.getServiceTypeId().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ServiceType ID must not be empty");
+        }
+
+        boolean exists = serviceTypeRepository.existsById(request.getServiceTypeId());
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ServiceType ID not found");
+        }
+
+        if (request.getType() == null || String.valueOf(request.getType()).trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Type must not be empty");
+        }
+
+
+        if (request.getService() == null || request.getService().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Service must not be empty");
+        }
+
+        if (request.getPrice() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price must not be null");
+        } else if (request.getPrice() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price must be greater than zero");
+        }
+
+        if (request.getDetail() == null || String.valueOf(request.getDetail()).trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Detail must not be empty");
+        }
+
+
+        if (request.getServiceTypeId() == null || request.getServiceTypeId().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Account ID must not be empty");
         }
     }
 

@@ -12,6 +12,7 @@ import com.gruptiga.smartlaundry.service.AccountService;
 import com.gruptiga.smartlaundry.service.ServiceTypeService;
 import com.gruptiga.smartlaundry.specification.ServiceTypeSpecification;
 import com.gruptiga.smartlaundry.validation.ServiceTypeValidator;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -60,7 +61,6 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
 
         return ServiceTypeResponse.builder()
                 .serviceTypeId(id)
-                .accountId(serviceType.getAccount().getAccountId())
                 .type(serviceType.getType().toString())
                 .service(serviceType.getService())
                 .price(serviceType.getPrice())
@@ -83,6 +83,19 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
         } else {
             return serviceTypeRepository.findAll(serviceTypeSpecification).stream().map(this::parseServiceTypeToServiceTypeResponse).toList();
         }
+    }
+
+    @Override
+    @Transactional
+    public ServiceTypeResponse updateServiceType(ServiceType serviceType) {
+        serviceTypeValidator.validateUpdateServiceTypeRequest(serviceType);
+
+        serviceTypeRepository.findById(serviceType.getServiceTypeId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer ID not found"));
+
+        serviceTypeRepository.saveAndFlush(serviceType);
+
+        return parseServiceTypeToServiceTypeResponse(serviceType);
     }
 
     @Override
