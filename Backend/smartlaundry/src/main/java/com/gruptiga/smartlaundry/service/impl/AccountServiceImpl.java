@@ -11,20 +11,30 @@ import com.gruptiga.smartlaundry.entity.ServiceType;
 import com.gruptiga.smartlaundry.entity.Transaction;
 import com.gruptiga.smartlaundry.repository.AccountRepository;
 import com.gruptiga.smartlaundry.service.AccountService;
+import com.gruptiga.smartlaundry.service.JwtService;
 import com.gruptiga.smartlaundry.specification.AccountSpecification;
+import com.gruptiga.smartlaundry.validation.AccountValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AccountValidator accountValidator;
+    private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@(.+)$";
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
 
     @Override
     public AccountResponse createAccount(AccountRequest accountRequest) {
@@ -63,6 +73,38 @@ public class AccountServiceImpl implements AccountService {
     public Account getByEmail(String email) {
         return accountRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Email Account tidak ditemukan!!!"));
+    }
+
+
+    @Transactional
+    public void updateAccount(String email, AccountRequest request) {
+        accountValidator.validateAccountRequest(request);
+
+        if (!accountRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Account Tidak ada");
+        }
+
+        if (!accountRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Account does not exist");
+        }
+
+        if (!email.equals(request.getEmail()) && accountRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("New email is already taken");
+        }
+
+        if (!EMAIL_PATTERN.matcher(request.getEmail()).matches()) {
+            throw new IllegalArgumentException("New email format is invalid");
+        }
+
+        String hashPassword = passwordEncoder.encode(request.getPassword());
+
+        accountRepository.updateAccount(
+                email,
+                request.getName(),
+                request.getAddress(),
+                request.getContact(),
+                hashPassword
+        );
     }
 
     @Override

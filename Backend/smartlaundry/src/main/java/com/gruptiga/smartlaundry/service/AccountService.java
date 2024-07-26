@@ -20,5 +20,6 @@ public interface AccountService {
     long count();
     List<Customer> getCustomersByEmail(String email);
     List<ServiceType> getServiceTypesByEmail(String email);
+    void updateAccount(String email, AccountRequest request);
 
 }

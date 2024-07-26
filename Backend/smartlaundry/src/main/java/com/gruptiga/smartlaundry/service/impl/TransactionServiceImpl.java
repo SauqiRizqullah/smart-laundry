@@ -41,31 +41,15 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final AccountService accountService;
 
-    private final UserService userService;
-
-    private final ServiceTypeService typeService;
-
-    private final CustomerService customerService;
-
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public TransactionResponse createNewTransaction(TransactionRequest request) {
+    public TransactionResponse createNewTransaction(TransactionRequest request, String email) {
 
         // cari objek yang sudah ada
 
+        Account accountss = accountService.getByEmail(email);
 
-        Account currentAccount = userService.getByContext();
-
-
-
-        Customer customer = customerService.getById(request.getCustomersId());
-
-        ServiceType serviceType = typeService.getById(request.getServiceTypeId());
-
-        if(!currentAccount.getAccountId().equals(serviceType.getAccount().getAccountId())){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Tidak diizinkan membuat data transaksi untuk akun laundry yang lain.");
-        }
 
         // Convert Tanggal
         Date dateNow = new Date();
@@ -77,12 +61,12 @@ public class TransactionServiceImpl implements TransactionService {
         // Buat objek transaksi
 
         Transaction trx = Transaction.builder()
-                .account(currentAccount)
-                .customer(customer)
-                .serviceType(serviceType)
+                .account(accountss)
+                .customerId(request.getCustomersId())
+                .serviceTypeId(request.getServiceTypeId())
                 .status(Status.ANTRIAN)
                 .qty(request.getQty())
-                .totalPrice(serviceType.getPrice() * request.getQty())
+                .totalPrice(Long.valueOf(request.getServicePrice() * request.getQty()))
                 .payment(Payment.valueOf(request.getPayment()))
                 .orderDate(localDate)
                 .build();
@@ -93,10 +77,10 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction savedTransaction = transactionRepository.save(trx);
 
         return TransactionResponse.builder()
-                .trxId(savedTransaction.getTrxId())
                 .accountId(savedTransaction.getAccount().getAccountId())
-                .customerId(savedTransaction.getCustomer().getCustomerId())
-                .serviceTypeId(savedTransaction.getServiceType().getServiceTypeId())
+                .trxId(savedTransaction.getTrxId())
+                .customerId(savedTransaction.getCustomerId())
+                .serviceTypeId(savedTransaction.getServiceTypeId())
                 .status(savedTransaction.getStatus().toString())
                 .qty(savedTransaction.getQty())
                 .totalPrice(savedTransaction.getTotalPrice())
@@ -142,9 +126,6 @@ public class TransactionServiceImpl implements TransactionService {
         return transactions.stream().map(trx ->{
             return TransactionResponse.builder()
                     .trxId(trx.getTrxId())
-                    .serviceTypeId(trx.getServiceType().getServiceTypeId())
-                    .accountId(trx.getAccount().getAccountId())
-                    .customerId(trx.getCustomer().getCustomerId())
                     .status(trx.getStatus().toString())
                     .qty(trx.getQty())
                     .totalPrice(trx.getTotalPrice())
@@ -157,21 +138,11 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public TransactionResponse updateStatusDone(String id) {
-        // Mendapatkan account dari context
-        Account currentAccount = userService.getByContext();
+        Transaction trx = transactionRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Id transaksi tidak ditemukan!!!"));
 
-        // Menemukan transaksi berdasarkan ID dan memastikan accountId sesuai dengan context
-        Transaction trx = transactionRepository.findById(id)
-                .filter(transaction -> transaction.getAccount().getAccountId().equals(currentAccount.getAccountId()))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id transaksi tidak ditemukan atau tidak memiliki akses!!!"));
+        trx.setStatus(Status.SELESAI);
 
-        // Memperbarui status transaksi
-        if (trx.getStatus() == Status.ANTRIAN){
-            trx.setStatus(Status.SEDANG_DICUCI);
-        } else {
-            trx.setStatus(Status.SELESAI);
-        }
-
+//        transactionRepository.updateStatusById(id, newStatus);
         transactionRepository.save(trx);
 
         return parseTransactionToTransactionResponse(trx);
@@ -184,23 +155,14 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<TransactionResponse> getAllTransactionsBaru(SearchTransactionRequest request) {
-        Account currentAccount = userService.getByContext();
-
-        // Menambahkan filter berdasarkan accountId dari context
-        Specification<Transaction> specification = TransactionSpecifications.getSpecification(request)
-                .and((root, query, criteriaBuilder) ->
-                        criteriaBuilder.equal(root.get("account").get("accountId"), currentAccount.getAccountId()));
-
-        // Mencari transactions berdasarkan filter yang telah ditentukan
-        List<Transaction> transactions;
-        if(request.getOrderDate() == null && request.getStatus() == null && request.getMinDate() == null && request.getMaxDate() == null){
-            transactions = transactionRepository.findAll(specification);
+        Specification<Transaction> specification = TransactionSpecifications.getSpecification(request);
+        if(request.getOrderDate() == null && request.getStatus() == null){
+            return transactionRepository.findAll().stream().map(this::parseTransactionToTransactionResponse).toList();
         } else {
-            transactions = transactionRepository.findAll(specification);
+            return transactionRepository.findAll(specification).stream().map(
+                    this::parseTransactionToTransactionResponse
+            ).toList();
         }
-
-        // Mengonversi hasil menjadi TransactionResponse
-        return transactions.stream().map(this::parseTransactionToTransactionResponse).toList();
 
     }
 
@@ -214,9 +176,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         return TransactionResponse.builder()
                 .trxId(id)
-                .serviceTypeId(trx.getCustomer().getCustomerId())
-                .customerId(trx.getServiceType().getServiceTypeId())
-                .accountId(trx.getAccount().getAccountId())
                 .status(trx.getStatus().toString())
                 .qty(trx.getQty())
                 .totalPrice(trx.getTotalPrice())

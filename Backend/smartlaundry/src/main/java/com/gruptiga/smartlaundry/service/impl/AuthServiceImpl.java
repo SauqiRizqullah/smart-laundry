@@ -8,6 +8,7 @@ import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.repository.AccountRepository;
 import com.gruptiga.smartlaundry.service.AuthService;
 import com.gruptiga.smartlaundry.service.JwtService;
+import com.gruptiga.smartlaundry.validation.AccountValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,12 +28,19 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
 
     private final AuthenticationManager authenticationManager;
+    private final AccountValidator accountValidator;
+
 
 
     @PreAuthorize("permitAll()")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public AccountResponse register(AccountRequest request) throws DataIntegrityViolationException {
+        accountValidator.validateAccountRequest(request);
+        // Cek apakah email sudah ada
+        if (userAccountRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email is already taken");
+        }
 
         String hashPassword = passwordEncoder.encode(request.getPassword());
 
@@ -53,25 +61,9 @@ public class AuthServiceImpl implements AuthService {
                 .contact(account.getContact())
                 .email(account.getEmail())
                 .build();
-
     }
 
-    private AccountResponse parseAccountToAccountResponse(Account account) {
-        String id;
-        if (account.getAccountId() == null) {
-            id = null;
-        } else {
-            id = account.getAccountId();
-        }
 
-        return AccountResponse.builder()
-                .accountId(id)
-                .name(account.getName())
-                .address(account.getAddress())
-                .contact(account.getContact())
-                .email(account.getEmail())
-                .build();
-    }
 
 
     @Transactional(readOnly = true)

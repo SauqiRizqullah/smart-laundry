@@ -1,6 +1,7 @@
 package com.gruptiga.smartlaundry.controller;
 
 import com.gruptiga.smartlaundry.constant.APIUrl;
+import com.gruptiga.smartlaundry.dto.request.AccountRequest;
 import com.gruptiga.smartlaundry.dto.request.SearchAccountRequest;
 import com.gruptiga.smartlaundry.dto.response.AccountResponse;
 import com.gruptiga.smartlaundry.dto.response.CommonResponse;
@@ -76,6 +77,16 @@ public class AccountController {
     public ResponseEntity<List<ServiceType>> getServiceTypesByEmail(@RequestParam String email) {
         List<ServiceType> serviceTypes = accountService.getServiceTypesByEmail(email);
         return new ResponseEntity<>(serviceTypes, HttpStatus.OK);
+    }
+
+    @PutMapping("/update/{email}")
+    public ResponseEntity<String> updateAccount(@PathVariable String email, @RequestBody AccountRequest request) {
+        try {
+            accountService.updateAccount(email, request);
+            return new ResponseEntity<>("Account updated successfully", HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
 //    @GetMapping(path = "/transactions", produces = "application/json")

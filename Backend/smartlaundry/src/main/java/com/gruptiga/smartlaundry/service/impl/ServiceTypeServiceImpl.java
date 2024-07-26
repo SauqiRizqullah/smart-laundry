@@ -10,7 +10,6 @@ import com.gruptiga.smartlaundry.entity.ServiceType;
 import com.gruptiga.smartlaundry.repository.ServiceTypeRepository;
 import com.gruptiga.smartlaundry.service.AccountService;
 import com.gruptiga.smartlaundry.service.ServiceTypeService;
-import com.gruptiga.smartlaundry.service.UserService;
 import com.gruptiga.smartlaundry.specification.ServiceTypeSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,19 +26,9 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
 
     private final AccountService accountService;
 
-    private final UserService userService;
-
 
     @Override
     public ServiceTypeResponse createServiceType(ServiceTypeRequest serviceTypeRequest) {
-
-
-
-        Account currenAccount = userService.getByContext();
-
-        if (!currenAccount.getAccountId().equals(serviceTypeRequest.getAccountId())){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Tidak diizinkan membuat data pelayanan laundry untuk akun laundry yang lain.");
-        }
 
         Account account = accountService.getById(serviceTypeRequest.getAccountId());
 
@@ -78,29 +67,17 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
     public ServiceType getById(String serviceTypeId) {
         ServiceType serviceType = serviceTypeRepository.findById(serviceTypeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id pelayanan laundry tidak ditemukan!!!"));
 
-        Account currenAccount = userService.getByContext();
-
-        if (!currenAccount.getAccountId().equals(serviceType.getAccount().getAccountId())){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Tidak diizinkan mengambil data pelayanan laundry untuk akun laundry yang lain.");
-        }
-
         return serviceType;
     }
 
     @Override
     public List<ServiceTypeResponse> getAllServicesType(SearchServiceTypeRequest serviceTypeRequest) {
-        Account currentAccount = userService.getByContext();
-
-        // Menambahkan filter berdasarkan accountId dari context
-        Specification<ServiceType> serviceTypeSpecification = ServiceTypeSpecification.getSpecification(serviceTypeRequest)
-                .and((root, query, criteriaBuilder) ->
-                        criteriaBuilder.equal(root.get("account").get("accountId"), currentAccount.getAccountId()));
-
-        // Mencari service type berdasarkan filter yang telah ditentukan
-        List<ServiceType> serviceTypes = serviceTypeRepository.findAll(serviceTypeSpecification);
-
-        // Mengonversi hasil menjadi ServiceTypeResponse
-        return serviceTypes.stream().map(this::parseServiceTypeToServiceTypeResponse).toList();
+        Specification<ServiceType> serviceTypeSpecification = ServiceTypeSpecification.getSpecification(serviceTypeRequest);
+        if(serviceTypeRequest.getType() == null && serviceTypeRequest.getService() == null){
+            return serviceTypeRepository.findAll().stream().map(this::parseServiceTypeToServiceTypeResponse).toList();
+        } else {
+            return serviceTypeRepository.findAll(serviceTypeSpecification).stream().map(this::parseServiceTypeToServiceTypeResponse).toList();
+        }
     }
 
     @Override

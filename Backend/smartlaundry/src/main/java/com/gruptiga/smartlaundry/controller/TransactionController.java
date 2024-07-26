@@ -20,9 +20,10 @@ public class TransactionController {
 
     @PostMapping(produces = "application/json")
     public TransactionResponse createNewTransaction (
-            @RequestBody TransactionRequest transactionRequest
+            @RequestBody TransactionRequest transactionRequest,
+            @RequestParam String email
     ){
-        return transactionService.createNewTransaction(transactionRequest);
+        return transactionService.createNewTransaction(transactionRequest, email);
     }
 
 //    @GetMapping(produces = "application/json")
@@ -51,7 +52,7 @@ public class TransactionController {
                 .minDate(minDate)
                 .maxDate(maxDate)
                 .build();
-       return transactionService.getAllTransactionsBaru(searchTransactionRequest);
+        return transactionService.getAllTransactionsBaru(searchTransactionRequest);
 
 //        return transactionService.getAllTransactions();
     }
