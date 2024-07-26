@@ -3,6 +3,7 @@ package com.gruptiga.smartlaundry.repository;
 import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.entity.Customer;
 import com.gruptiga.smartlaundry.entity.ServiceType;
+import com.gruptiga.smartlaundry.entity.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -36,4 +37,7 @@ public interface AccountRepository extends JpaRepository<Account, String>, JpaSp
             @Param("contact") String contact,
             @Param("password") String password
     );
+
+    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email")
+    List<Transaction> findTransactionsByAccountEmail(@Param("email") String email);
 }

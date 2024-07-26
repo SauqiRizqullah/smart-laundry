@@ -5,13 +5,16 @@ import com.gruptiga.smartlaundry.constant.Status;
 import com.gruptiga.smartlaundry.dto.request.SearchTransactionRequest;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.request.TransactionRequest;
+import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
 import com.gruptiga.smartlaundry.dto.response.TransactionResponse;
 import com.gruptiga.smartlaundry.entity.*;
 import com.gruptiga.smartlaundry.repository.TransactionRepository;
 import com.gruptiga.smartlaundry.service.*;
 import com.gruptiga.smartlaundry.specification.TransactionSpecifications;
+import com.gruptiga.smartlaundry.validation.TransactionValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import static java.lang.Long.parseLong;
 
@@ -41,10 +45,15 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final AccountService accountService;
 
+    @Autowired
+    private TransactionValidator transactionValidator;
+
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public TransactionResponse createNewTransaction(TransactionRequest request, String email) {
+
+        transactionValidator.validateCreateTransactionRequest(request);
 
         // cari objek yang sudah ada
 
@@ -138,6 +147,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public TransactionResponse updateStatusDone(String id) {
+
         Transaction trx = transactionRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Id transaksi tidak ditemukan!!!"));
 
         trx.setStatus(Status.SELESAI);
@@ -149,9 +159,33 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<TransactionResponse> getByDateAndAccount(String date, String accountId) {
-        return List.of();
+    public List<TransactionResponse> getByDateAndAccount(String date, String email) {
+        // Get account by email
+        Account account = accountService.getByEmail(email);
+
+        // Convert date string to LocalDate
+        LocalDate orderDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
+
+        // Get transactions by accountId and orderDate
+        List<Transaction> transactions = transactionRepository.findTransactionsByAccountIdAndOrderDate(
+                account.getAccountId(), orderDate);
+
+        // Convert Transaction entities to TransactionResponse DTOs
+        return transactions.stream()
+                .map(trx -> TransactionResponse.builder()
+                        .accountId(trx.getAccount() != null ? trx.getAccount().getAccountId() : null) // Ensure accountId is set
+                        .trxId(trx.getTrxId())
+                        .customerId(trx.getCustomerId())
+                        .serviceTypeId(trx.getServiceTypeId())
+                        .status(trx.getStatus().toString())
+                        .qty(trx.getQty())
+                        .totalPrice(trx.getTotalPrice())
+                        .payment(trx.getPayment().toString())
+                        .orderDate(trx.getOrderDate())
+                        .build())
+                .collect(Collectors.toList());
     }
+
 
     @Override
     public List<TransactionResponse> getAllTransactionsBaru(SearchTransactionRequest request) {
@@ -184,5 +218,31 @@ public class TransactionServiceImpl implements TransactionService {
                 .build();
         // buat get by tanggal dan akun untuk transaksi
 
+    }
+
+    @Override
+    public TransactionResponse deleteById(String trxId) {
+        Transaction transaction = transactionRepository.findById(trxId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Id Transaction tidak ditemukan!!!"));
+        transactionRepository.delete(transaction);
+        return parseTransactionToTransactionResponse(transaction);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TransactionResponse getTransactionById(String trxId) {
+        Transaction transaction = transactionRepository.findById(trxId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+
+        return TransactionResponse.builder()
+                .accountId(transaction.getAccount() != null ? transaction.getAccount().getAccountId() : null)
+                .trxId(transaction.getTrxId())
+                .customerId(transaction.getCustomerId())
+                .serviceTypeId(transaction.getServiceTypeId())
+                .status(transaction.getStatus().toString())
+                .qty(transaction.getQty())
+                .totalPrice(transaction.getTotalPrice())
+                .payment(transaction.getPayment().toString())
+                .orderDate(transaction.getOrderDate())
+                .build();
     }
 }

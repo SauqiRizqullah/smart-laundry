@@ -79,6 +79,12 @@ public class AccountController {
         return new ResponseEntity<>(serviceTypes, HttpStatus.OK);
     }
 
+    @GetMapping("/transaction")
+    public ResponseEntity<List<Transaction>> getTransactions(@RequestParam String email) {
+        List<Transaction> transactions = accountService.findTransactionsByAccountEmail(email);
+        return new ResponseEntity<>(transactions, HttpStatus.OK);
+    }
+
     @PutMapping("/update")
     public ResponseEntity<String> updateAccount(@RequestParam String email, @RequestBody AccountRequest request) {
         try {

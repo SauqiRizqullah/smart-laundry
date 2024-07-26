@@ -24,7 +24,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping(path = "/register")
+    @PostMapping(path = APIUrl.REGISTER)
     public ResponseEntity<CommonResponse<?>> registerUser(@RequestBody AccountRequest request){
         AccountResponse register = authService.register(request);
         CommonResponse<AccountResponse> response = CommonResponse.<AccountResponse>builder()
@@ -35,7 +35,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping(path = "/login")
+    @PostMapping(path = APIUrl.LOGIN)
     public ResponseEntity<CommonResponse<?>> login(@RequestBody AuthRequest request){
         LoginResponse loginResponse = authService.login(request);
         CommonResponse<LoginResponse> response = CommonResponse.<LoginResponse>builder()

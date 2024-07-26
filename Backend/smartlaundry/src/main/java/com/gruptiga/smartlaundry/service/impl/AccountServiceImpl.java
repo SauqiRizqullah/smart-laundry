@@ -107,6 +107,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public List<Transaction> findTransactionsByAccountEmail(String email) {
+        return accountRepository.findTransactionsByAccountEmail(email);
+    }
+
+    @Override
     public List<AccountResponse> getAllAccounts(SearchAccountRequest accountRequest) {
         Specification<Account> accountSpecification = AccountSpecification.getSpecification(accountRequest);
         if (accountRequest.getName() == null) {

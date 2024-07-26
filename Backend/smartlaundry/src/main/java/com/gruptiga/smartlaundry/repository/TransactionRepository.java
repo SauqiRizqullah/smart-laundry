@@ -9,6 +9,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Repository
 @Transactional
 public interface TransactionRepository extends JpaRepository<Transaction, String>, JpaSpecificationExecutor<Transaction> {
@@ -16,5 +19,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     @Modifying
     @Query(value = "UPDATE Transaction t SET t.status = :newStatus WHERE t.trxId = :id")
     void updateStatusById(@Param("id")String id, @Param("newStatus") String newStatus);
+
+    @Query("SELECT t FROM Transaction t WHERE t.account.id = :accountId AND t.orderDate = :orderDate")
+    List<Transaction> findTransactionsByAccountIdAndOrderDate(
+            @Param("accountId") String accountId,
+            @Param("orderDate") LocalDate orderDate
+    );
 
 }

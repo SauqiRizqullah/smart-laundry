@@ -14,6 +14,9 @@ public class APIUrl {
     public static final String USER_CONTEXT = "/currentuser";
     public static final String USER = "/api/v1/security";
     public static final String LOGOUT = "/logout";
+    public static final String BY_DATE_ACCOUNT = "/by-date-and-account";
+    public static final String LOGIN = "/loggin";
+    public static final String REGISTER = "/register";
 }
 
 

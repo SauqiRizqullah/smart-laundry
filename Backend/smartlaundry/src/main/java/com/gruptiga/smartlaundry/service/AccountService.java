@@ -21,5 +21,6 @@ public interface AccountService {
     List<Customer> getCustomersByEmail(String email);
     List<ServiceType> getServiceTypesByEmail(String email);
     void updateAccount(String email, AccountRequest request);
+    List<Transaction> findTransactionsByAccountEmail(String email);
 
 }
