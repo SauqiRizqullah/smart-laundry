@@ -24,6 +24,8 @@ public class TransactionResponse {
 
     private String status;
 
+    private String statusPembayaran;
+
     private Integer qty;
 
     private Long totalPrice;
@@ -31,4 +33,5 @@ public class TransactionResponse {
     private String payment;
 
     private LocalDate orderDate;
+    private String paymentUrl;
 }

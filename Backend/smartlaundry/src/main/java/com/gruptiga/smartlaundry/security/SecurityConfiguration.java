@@ -41,6 +41,7 @@ public class SecurityConfiguration {
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/security/currentuser").permitAll()
+                        .requestMatchers("/api/v1/midtrans").permitAll()  // Allow webhook endpoint
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling

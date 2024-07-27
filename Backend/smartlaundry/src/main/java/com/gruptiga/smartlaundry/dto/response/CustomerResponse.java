@@ -15,6 +15,5 @@ public class CustomerResponse {
     private String address;
 
     private String phoneNumber;
-    private String accountId;
 
 }

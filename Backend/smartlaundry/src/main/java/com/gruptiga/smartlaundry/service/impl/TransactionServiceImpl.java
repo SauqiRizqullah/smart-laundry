@@ -1,6 +1,7 @@
 package com.gruptiga.smartlaundry.service.impl;
 
 import com.gruptiga.smartlaundry.constant.Payment;
+import com.gruptiga.smartlaundry.constant.STATUS_PEMBAYARAN;
 import com.gruptiga.smartlaundry.constant.Status;
 import com.gruptiga.smartlaundry.dto.request.SearchTransactionRequest;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,9 +30,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -48,6 +48,9 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private TransactionValidator transactionValidator;
 
+    private final MidtransService midtransService;
+
+
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -55,22 +58,17 @@ public class TransactionServiceImpl implements TransactionService {
 
         transactionValidator.validateCreateTransactionRequest(request);
 
-        // cari objek yang sudah ada
+        // Fetch existing account
+        Account account = accountService.getByEmail(email);
 
-        Account accountss = accountService.getByEmail(email);
-
-
-        // Convert Tanggal
+        // Convert Date
         Date dateNow = new Date();
-
         Instant instant = dateNow.toInstant();
-
         LocalDate localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
 
-        // Buat objek transaksi
-
+        // Create transaction object
         Transaction trx = Transaction.builder()
-                .account(accountss)
+                .account(account)
                 .customerId(request.getCustomersId())
                 .serviceTypeId(request.getServiceTypeId())
                 .status(Status.ANTRIAN)
@@ -78,25 +76,70 @@ public class TransactionServiceImpl implements TransactionService {
                 .totalPrice(Long.valueOf(request.getServicePrice() * request.getQty()))
                 .payment(Payment.valueOf(request.getPayment()))
                 .orderDate(localDate)
+                .statusPembayaran(STATUS_PEMBAYARAN.BELUM_DIBAYAR)
                 .build();
 
-
-        // Simpan transaksi di database
-
+        // Save transaction to database
         Transaction savedTransaction = transactionRepository.save(trx);
 
-        return TransactionResponse.builder()
-                .accountId(savedTransaction.getAccount().getAccountId())
-                .trxId(savedTransaction.getTrxId())
-                .customerId(savedTransaction.getCustomerId())
-                .serviceTypeId(savedTransaction.getServiceTypeId())
-                .status(savedTransaction.getStatus().toString())
-                .qty(savedTransaction.getQty())
-                .totalPrice(savedTransaction.getTotalPrice())
-                .payment(savedTransaction.getPayment().toString())
-                .orderDate(savedTransaction.getOrderDate())
-                .build();
+        // Prepare Midtrans transaction request
+        Map<String, Object> transactionRequest = new HashMap<>();
+        transactionRequest.put("payment_type", request.getPayment());
+        transactionRequest.put("transaction_details", Map.of(
+                "order_id", savedTransaction.getTrxId(),
+                "gross_amount", savedTransaction.getTotalPrice()
+        ));
+        transactionRequest.put("customer_details", Map.of(
+                "first_name", request.getCustomersId()
+//                "last_name", "Doe",
+//                 "email", "john.doe@example.com",
+//                 "phone", "08123456789"
+        ));
+        transactionRequest.put("custom_expiry", Map.of(
+                "expiry_duration", 60,
+                "unit", "minute"
+        ));
+
+        // Create Midtrans transaction
+        try {
+            Map<String, Object> transactionResult = midtransService.createTransaction(transactionRequest);
+
+            if ("201".equals(transactionResult.get("status_code"))) {
+                // Update transaction status and save
+                trx.setStatus(Status.ANTRIAN);
+                transactionRepository.save(trx);
+
+                // Extract QR code URL
+                List<Map<String, Object>> actions = (List<Map<String, Object>>) transactionResult.get("actions");
+                if (actions != null && !actions.isEmpty()) {
+                    Map<String, Object> action = actions.get(0);
+                    String qrCodeUrl = (String) action.get("url");
+
+                    // Build and return response with QR code URL
+                    return TransactionResponse.builder()
+                            .accountId(savedTransaction.getAccount().getAccountId())
+                            .trxId(savedTransaction.getTrxId())
+                            .customerId(savedTransaction.getCustomerId())
+                            .serviceTypeId(savedTransaction.getServiceTypeId())
+                            .status(trx.getStatus().toString())
+                            .qty(savedTransaction.getQty())
+                            .totalPrice(savedTransaction.getTotalPrice())
+                            .payment(savedTransaction.getPayment().toString())
+                            .orderDate(savedTransaction.getOrderDate())
+                            .paymentUrl(qrCodeUrl)
+                            .statusPembayaran(String.valueOf(trx.getStatusPembayaran()))
+                            .build();
+                } else {
+                    throw new RuntimeException("No actions found in Midtrans response.");
+                }
+            } else {
+                throw new RuntimeException("Failed to create Midtrans transaction: " + transactionResult.get("status_message"));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error occurred while creating Midtrans transaction", e);
+        }
     }
+
 
     @Override
     public List<TransactionResponse> getAllTransactions() {
@@ -104,33 +147,6 @@ public class TransactionServiceImpl implements TransactionService {
         // Memanggil repository findAll terlebih dahulu
         List<Transaction> transactions = transactionRepository.findAll();
 
-//        return transactions.stream().map(trx -> {
-//            List<TransactionDetailResponse> trxDetailResponse = trx.getTransactionDetailList().stream().map(trxDetail -> {
-//                return TransactionDetailResponse.builder()
-//                        .trxDetailId(trxDetail.getTrxDetailId())
-//                        .serviceTypeId(trxDetail.getServiceType().getServiceTypeId())
-//                        .qty(trxDetail.getQty())
-//                        .price(trxDetail.getPrice())
-//                        .build();
-//            }).toList();
-//
-//            AtomicLong totalPrices = new AtomicLong();
-//
-//            // Logic untuk mendapatkan Array yang berisi harga setiap transaksi detail
-//
-//            trxDetailResponse.forEach(detail -> totalPrices.addAndGet(detail.getPrice()));
-//
-//            return TransactionResponse.builder()
-//                    .trxId(trx.getTrxId())
-//                    .customerId(trx.getCustomer().getCustomerId())
-//                    .accountId(trx.getAccount().getAccountId())
-//                    .status(trx.getStatus().toString())
-//                    .transactionDetailList(trx.getTransactionDetailList())
-//                    .totalPrice(totalPrices.get())
-//                    .payment(trx.getPayment().toString())
-//                    .orderDate(trx.getOrderDate())
-//                    .build();
-//        }).toList();
 
         return transactions.stream().map(trx ->{
             return TransactionResponse.builder()
@@ -152,7 +168,32 @@ public class TransactionServiceImpl implements TransactionService {
 
         trx.setStatus(Status.SELESAI);
 
-//        transactionRepository.updateStatusById(id, newStatus);
+        transactionRepository.save(trx);
+
+        return parseTransactionToTransactionResponse(trx);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public TransactionResponse updateStatusPembayaranDone(String id) {
+
+        Transaction trx = transactionRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Id transaksi tidak ditemukan!!!"));
+
+        trx.setStatusPembayaran(STATUS_PEMBAYARAN.SUDAH_DIBAYAR);
+
+        transactionRepository.save(trx);
+
+        return parseTransactionToTransactionResponse(trx);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public TransactionResponse updateStatusPembayaranExpired(String id) {
+
+        Transaction trx = transactionRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Id transaksi tidak ditemukan!!!"));
+
+        trx.setStatusPembayaran(STATUS_PEMBAYARAN.EXPIRED);
+
         transactionRepository.save(trx);
 
         return parseTransactionToTransactionResponse(trx);
@@ -200,21 +241,25 @@ public class TransactionServiceImpl implements TransactionService {
 
     }
 
-    private TransactionResponse parseTransactionToTransactionResponse(Transaction trx) {
+    private TransactionResponse parseTransactionToTransactionResponse(Transaction transaction) {
         String id;
-        if (trx.getTrxId() == null){
+        if (transaction.getTrxId() == null){
             id = null;
         } else {
-            id = trx.getTrxId();
+            id = transaction.getTrxId();
         }
 
         return TransactionResponse.builder()
-                .trxId(id)
-                .status(trx.getStatus().toString())
-                .qty(trx.getQty())
-                .totalPrice(trx.getTotalPrice())
-                .payment(trx.getPayment().toString())
-                .orderDate(trx.getOrderDate())
+                .accountId(transaction.getAccount() != null ? transaction.getAccount().getAccountId() : null)
+                .trxId(transaction.getTrxId())
+                .customerId(transaction.getCustomerId())
+                .serviceTypeId(transaction.getServiceTypeId())
+                .status(transaction.getStatus().toString())
+                .qty(transaction.getQty())
+                .totalPrice(transaction.getTotalPrice())
+                .payment(transaction.getPayment().toString())
+                .orderDate(transaction.getOrderDate())
+                .statusPembayaran(String.valueOf(transaction.getStatusPembayaran()))
                 .build();
         // buat get by tanggal dan akun untuk transaksi
 
@@ -243,6 +288,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .totalPrice(transaction.getTotalPrice())
                 .payment(transaction.getPayment().toString())
                 .orderDate(transaction.getOrderDate())
+                .statusPembayaran(String.valueOf(transaction.getStatusPembayaran()))
                 .build();
     }
 }

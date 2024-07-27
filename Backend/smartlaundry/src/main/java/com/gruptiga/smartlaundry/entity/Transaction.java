@@ -3,6 +3,7 @@ package com.gruptiga.smartlaundry.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gruptiga.smartlaundry.constant.ConstantTable;
 import com.gruptiga.smartlaundry.constant.Payment;
+import com.gruptiga.smartlaundry.constant.STATUS_PEMBAYARAN;
 import com.gruptiga.smartlaundry.constant.Status;
 import jakarta.persistence.*;
 import lombok.*;
@@ -52,4 +53,7 @@ public class Transaction {
 
     @Column(name = "order_date")
     private LocalDate orderDate;
+
+    @Column(name = "status_pembayaran")
+    private STATUS_PEMBAYARAN statusPembayaran;
 }

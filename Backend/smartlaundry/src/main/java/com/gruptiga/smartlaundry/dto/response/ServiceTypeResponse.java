@@ -10,8 +10,6 @@ import lombok.Setter;
 public class ServiceTypeResponse {
     private String serviceTypeId;
 
-    private String accountId;
-
     private String type;
 
     private String service;

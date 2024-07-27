@@ -15,6 +15,10 @@ public interface TransactionService {
 
     TransactionResponse updateStatusDone(String id);
 
+    TransactionResponse updateStatusPembayaranDone(String id);
+
+    TransactionResponse updateStatusPembayaranExpired(String id);
+
     List<TransactionResponse> getByDateAndAccount(String date, String email);
 
     List<TransactionResponse> getAllTransactionsBaru(SearchTransactionRequest request);
