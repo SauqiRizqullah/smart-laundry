@@ -2,7 +2,9 @@ package com.gruptiga.smartlaundry.controller;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gruptiga.smartlaundry.constant.APIUrl;
+import com.gruptiga.smartlaundry.constant.Status;
 import com.gruptiga.smartlaundry.dto.request.SearchTransactionRequest;
+import com.gruptiga.smartlaundry.dto.request.StatusUpdateRequest;
 import com.gruptiga.smartlaundry.dto.request.TransactionRequest;
 import com.gruptiga.smartlaundry.dto.response.CommonResponse;
 import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
@@ -32,16 +34,20 @@ public class TransactionController {
         return transactionService.createNewTransaction(transactionRequest, email);
     }
 
-//    @GetMapping(produces = "application/json")
-//    public List<TransactionResponse> getAllTransactions (){
-//        return transactionService.getAllTransactions();
-//    }
 
     @PutMapping(path = APIUrl.PATH_VAR_TRANSACTION_ID, produces = "application/json")
-    public TransactionResponse updateStatusDoneById (
-            @PathVariable String trxId
-    ){
-        return transactionService.updateStatusDone(trxId);
+    public ResponseEntity<TransactionResponse> updateStatusDoneById(
+            @PathVariable String trxId,
+            @RequestBody StatusUpdateRequest statusUpdateRequest) {
+        Status status;
+        try {
+            status = Status.valueOf(statusUpdateRequest.getStatus());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        TransactionResponse updatedTransactionResponse = transactionService.updateStatusDone(trxId, status);
+        return ResponseEntity.ok(updatedTransactionResponse);
     }
 
     @GetMapping(produces = "application/json")
@@ -60,7 +66,6 @@ public class TransactionController {
                 .build();
         return transactionService.getAllTransactionsBaru(searchTransactionRequest);
 
-//        return transactionService.getAllTransactions();
     }
 
     @DeleteMapping(path = APIUrl.PATH_VAR_TRANSACTION_ID,produces = "application/json")

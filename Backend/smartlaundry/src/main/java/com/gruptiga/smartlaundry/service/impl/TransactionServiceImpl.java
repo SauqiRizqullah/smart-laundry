@@ -90,10 +90,9 @@ public class TransactionServiceImpl implements TransactionService {
                 "gross_amount", savedTransaction.getTotalPrice()
         ));
         transactionRequest.put("customer_details", Map.of(
-                "first_name", request.getCustomersId()
-//                "last_name", "Doe",
-//                 "email", "john.doe@example.com",
-//                 "phone", "08123456789"
+                "first_name", request.getCustomersId(),
+                 "email", savedTransaction.getAccount().getEmail(),
+                 "phone", savedTransaction.getAccount().getContact()
         ));
         transactionRequest.put("custom_expiry", Map.of(
                 "expiry_duration", 60,
@@ -162,11 +161,11 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public TransactionResponse updateStatusDone(String id) {
+    public TransactionResponse updateStatusDone(String id, Status status) {
 
         Transaction trx = transactionRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Id transaksi tidak ditemukan!!!"));
 
-        trx.setStatus(Status.SELESAI);
+        trx.setStatus(status);
 
         transactionRepository.save(trx);
 

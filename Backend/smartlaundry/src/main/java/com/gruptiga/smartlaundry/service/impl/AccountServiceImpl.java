@@ -1,6 +1,8 @@
 package com.gruptiga.smartlaundry.service.impl;
 
 import com.gruptiga.smartlaundry.constant.EmailPattern;
+import com.gruptiga.smartlaundry.constant.STATUS_PEMBAYARAN;
+import com.gruptiga.smartlaundry.constant.Status;
 import com.gruptiga.smartlaundry.dto.request.AccountRequest;
 import com.gruptiga.smartlaundry.dto.request.SearchAccountRequest;
 import com.gruptiga.smartlaundry.dto.request.SearchCustomerRequest;
@@ -12,13 +14,11 @@ import com.gruptiga.smartlaundry.entity.ServiceType;
 import com.gruptiga.smartlaundry.entity.Transaction;
 import com.gruptiga.smartlaundry.repository.AccountRepository;
 import com.gruptiga.smartlaundry.service.AccountService;
-import com.gruptiga.smartlaundry.service.JwtService;
 import com.gruptiga.smartlaundry.specification.AccountSpecification;
 import com.gruptiga.smartlaundry.validation.AccountValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,6 +112,21 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public List<Transaction> getTransactionsByAccountEmailAndStatusPembayaran(String email, STATUS_PEMBAYARAN statusPembayaran) {
+        return accountRepository.findTransactionsByAccountEmailAndStatusPembayaran(email, statusPembayaran);
+    }
+
+    @Override
+    public List<Transaction> getTransactionsByAccountEmailAndStatus(String email, Status status) {
+        return accountRepository.findTransactionsByAccountEmailAndStatus(email, status);
+    }
+
+    @Override
+    public List<Transaction> getTransactionsByAccountEmailAndStatusAndStatusPembayaran(String email, Status status, STATUS_PEMBAYARAN statusPembayaran) {
+        return accountRepository.findTransactionsByAccountEmailAndStatusANDStatusPembayaran(email, status, statusPembayaran);
+    }
+
+    @Override
     public List<AccountResponse> getAllAccounts(SearchAccountRequest accountRequest) {
         Specification<Account> accountSpecification = AccountSpecification.getSpecification(accountRequest);
         if (accountRequest.getName() == null) {
@@ -141,4 +156,6 @@ public class AccountServiceImpl implements AccountService {
     public List<ServiceType> getServiceTypesByEmail(String email) {
         return accountRepository.findServiceTypesByAccountEmail(email);
     }
+
+
 }

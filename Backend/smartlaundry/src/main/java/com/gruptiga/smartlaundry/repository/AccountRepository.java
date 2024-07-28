@@ -1,5 +1,7 @@
 package com.gruptiga.smartlaundry.repository;
 
+import com.gruptiga.smartlaundry.constant.STATUS_PEMBAYARAN;
+import com.gruptiga.smartlaundry.constant.Status;
 import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.entity.Customer;
 import com.gruptiga.smartlaundry.entity.ServiceType;
@@ -40,4 +42,14 @@ public interface AccountRepository extends JpaRepository<Account, String>, JpaSp
 
     @Query("SELECT t FROM Transaction t WHERE t.account.email = :email")
     List<Transaction> findTransactionsByAccountEmail(@Param("email") String email);
+
+    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.statusPembayaran = :statusPembayaran")
+    List<Transaction> findTransactionsByAccountEmailAndStatusPembayaran(@Param("email") String email, @Param("statusPembayaran") STATUS_PEMBAYARAN statusPembayaran);
+
+    //status laundry
+    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.status = :status")
+    List<Transaction> findTransactionsByAccountEmailAndStatus(@Param("email") String email, @Param("status") Status status);
+
+    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.status = :status AND t.statusPembayaran = :statusPembayaran")
+    List<Transaction> findTransactionsByAccountEmailAndStatusANDStatusPembayaran(@Param("email") String email, @Param("status") Status status, @Param("statusPembayaran") STATUS_PEMBAYARAN statusPembayaran);
 }

@@ -1,6 +1,8 @@
 package com.gruptiga.smartlaundry.controller;
 
 import com.gruptiga.smartlaundry.constant.APIUrl;
+import com.gruptiga.smartlaundry.constant.STATUS_PEMBAYARAN;
+import com.gruptiga.smartlaundry.constant.Status;
 import com.gruptiga.smartlaundry.dto.request.AccountRequest;
 import com.gruptiga.smartlaundry.dto.request.SearchAccountRequest;
 import com.gruptiga.smartlaundry.dto.response.AccountResponse;
@@ -67,25 +69,25 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/customers")
+    @GetMapping(APIUrl.CUSTOMER_ACCOUNT)
     public ResponseEntity<List<Customer>> getCustomersByEmail(@RequestParam String email) {
         List<Customer> customers = accountService.getCustomersByEmail(email);
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 
-    @GetMapping("/serviceTypes")
+    @GetMapping(APIUrl.SERVICETYPE_ACCOUNT)
     public ResponseEntity<List<ServiceType>> getServiceTypesByEmail(@RequestParam String email) {
         List<ServiceType> serviceTypes = accountService.getServiceTypesByEmail(email);
         return new ResponseEntity<>(serviceTypes, HttpStatus.OK);
     }
 
-    @GetMapping("/transaction")
+    @GetMapping(APIUrl.TRANSACTION_ACCOUNT)
     public ResponseEntity<List<Transaction>> getTransactions(@RequestParam String email) {
         List<Transaction> transactions = accountService.findTransactionsByAccountEmail(email);
         return new ResponseEntity<>(transactions, HttpStatus.OK);
     }
 
-    @PutMapping("/update")
+    @PutMapping(APIUrl.UPDATE)
     public ResponseEntity<String> updateAccount(@RequestParam String email, @RequestBody AccountRequest request) {
         try {
             accountService.updateAccount(email, request);
@@ -95,16 +97,28 @@ public class AccountController {
         }
     }
 
-//    @GetMapping(path = "/transactions", produces = "application/json")
-//    public ResponseEntity<CommonResponse<List<Transaction>>> getTransactionsByAccountEmail(
-//            @RequestParam(name = "email") String email) {
-//        List<Transaction> transactions = accountService.getTransactionsByAccountEmail(email);
-//        CommonResponse<List<Transaction>> response = CommonResponse.<List<Transaction>>builder()
-//                .statusCode(HttpStatus.OK.value())
-//                .message("Data transaksi berdasarkan email akun berhasil didapatkan!!!")
-//                .data(transactions)
-//                .build();
-//
-//        return ResponseEntity.ok(response);
-//    }
+    @GetMapping(APIUrl.BYSTATUSPembayaran_ACCOUNT)
+    public ResponseEntity<List<Transaction>> getTransactionsByAccountEmailAndStatusPembayaran(
+            @RequestParam String email,
+            @RequestParam STATUS_PEMBAYARAN statusPembayaran) {
+        List<Transaction> transactions = accountService.getTransactionsByAccountEmailAndStatusPembayaran(email, statusPembayaran);
+        return ResponseEntity.ok(transactions);
+    }
+
+    @GetMapping(APIUrl.BYSTATUS_ACCOUNT)
+    public ResponseEntity<List<Transaction>> getTransactionsByAccountEmailAndStatus(
+            @RequestParam String email,
+            @RequestParam Status status) {
+        List<Transaction> transactions = accountService.getTransactionsByAccountEmailAndStatus(email, status);
+        return ResponseEntity.ok(transactions);
+    }
+    @GetMapping(APIUrl.BYSTATUS_Pembayaran_ACCOUNT)
+    public ResponseEntity<List<Transaction>> getTransactionsByAccountEmailAndStatusAndPembayaran(
+            @RequestParam String email,
+            @RequestParam Status status,
+            @RequestParam STATUS_PEMBAYARAN statusPembayaran
+            ) {
+        List<Transaction> transactions = accountService.getTransactionsByAccountEmailAndStatusAndStatusPembayaran(email, status, statusPembayaran);
+        return ResponseEntity.ok(transactions);
+    }
 }
