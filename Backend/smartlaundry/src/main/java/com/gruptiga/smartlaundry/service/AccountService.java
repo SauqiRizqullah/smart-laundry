@@ -9,6 +9,8 @@ import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.entity.Customer;
 import com.gruptiga.smartlaundry.entity.ServiceType;
 import com.gruptiga.smartlaundry.entity.Transaction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -18,12 +20,17 @@ public interface AccountService {
     Account getByEmail(String email);
     List<AccountResponse> getAllAccounts(SearchAccountRequest accountRequest);
     long count();
-    List<Customer> getCustomersByEmail(String email);
-    List<ServiceType> getServiceTypesByEmail(String email);
     void updateAccount(String email, AccountRequest request);
-    List<Transaction> findTransactionsByAccountEmail(String email);
-    List<Transaction> getTransactionsByAccountEmailAndStatusPembayaran(String email, STATUS_PEMBAYARAN statusPembayaran);
-    List<Transaction> getTransactionsByAccountEmailAndStatus(String email, Status status);
-    List<Transaction> getTransactionsByAccountEmailAndStatusAndStatusPembayaran(String email, Status status, STATUS_PEMBAYARAN statusPembayaran);
+    Page<Customer> getCustomersByEmail(String email, Pageable pageable);
+
+    Page<ServiceType> getServiceTypesByEmail(String email, Pageable pageable);
+
+    Page<Transaction> getTransactionsByAccountEmail(String email, Pageable pageable);
+
+    Page<Transaction> getTransactionsByAccountEmailAndStatusPembayaran(String email, STATUS_PEMBAYARAN statusPembayaran, Pageable pageable);
+
+    Page<Transaction> getTransactionsByAccountEmailAndStatus(String email, Status status, Pageable pageable);
+
+    Page<Transaction> getTransactionsByAccountEmailAndStatusAndStatusPembayaran(String email, Status status, STATUS_PEMBAYARAN statusPembayaran, Pageable pageable);
 
 }

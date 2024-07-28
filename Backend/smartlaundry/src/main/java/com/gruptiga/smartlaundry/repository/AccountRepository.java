@@ -6,6 +6,8 @@ import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.entity.Customer;
 import com.gruptiga.smartlaundry.entity.ServiceType;
 import com.gruptiga.smartlaundry.entity.Transaction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -36,21 +38,20 @@ public interface AccountRepository extends JpaRepository<Account, String>, JpaSp
     );
 
     @Query("SELECT c FROM Customer c WHERE c.account.email = :email")
-    List<Customer> findCustomersByAccountEmail(@Param("email") String email);
+    Page<Customer> findCustomersByAccountEmail(@Param("email") String email, Pageable pageable);
 
     @Query("SELECT s FROM ServiceType s WHERE s.account.email = :email")
-    List<ServiceType> findServiceTypesByAccountEmail(@Param("email") String email);
+    Page<ServiceType> findServiceTypesByAccountEmail(@Param("email") String email, Pageable pageable);
 
     @Query("SELECT t FROM Transaction t WHERE t.account.email = :email")
-    List<Transaction> findTransactionsByAccountEmail(@Param("email") String email);
+    Page<Transaction> findTransactionsByAccountEmail(@Param("email") String email, Pageable pageable);
 
     @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.statusPembayaran = :statusPembayaran")
-    List<Transaction> findTransactionsByAccountEmailAndStatusPembayaran(@Param("email") String email, @Param("statusPembayaran") STATUS_PEMBAYARAN statusPembayaran);
+    Page<Transaction> findTransactionsByAccountEmailAndStatusPembayaran(@Param("email") String email, @Param("statusPembayaran") STATUS_PEMBAYARAN statusPembayaran, Pageable pageable);
 
-    //status laundry
     @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.status = :status")
-    List<Transaction> findTransactionsByAccountEmailAndStatus(@Param("email") String email, @Param("status") Status status);
+    Page<Transaction> findTransactionsByAccountEmailAndStatus(@Param("email") String email, @Param("status") Status status, Pageable pageable);
 
     @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.status = :status AND t.statusPembayaran = :statusPembayaran")
-    List<Transaction> findTransactionsByAccountEmailAndStatusANDStatusPembayaran(@Param("email") String email, @Param("status") Status status, @Param("statusPembayaran") STATUS_PEMBAYARAN statusPembayaran);
+    Page<Transaction> findTransactionsByAccountEmailAndStatusANDStatusPembayaran(@Param("email") String email, @Param("status") Status status, @Param("statusPembayaran") STATUS_PEMBAYARAN statusPembayaran, Pageable pageable);
 }

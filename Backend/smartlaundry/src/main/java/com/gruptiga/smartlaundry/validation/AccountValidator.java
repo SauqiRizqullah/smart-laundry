@@ -3,7 +3,9 @@ package com.gruptiga.smartlaundry.validation;
 import com.gruptiga.smartlaundry.constant.EmailPattern;
 import com.gruptiga.smartlaundry.dto.request.AccountRequest;
 import com.gruptiga.smartlaundry.dto.request.AuthRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.regex.Pattern;
 
@@ -29,6 +31,13 @@ public class AccountValidator {
         }
         if (!EmailPattern.EMAIL_PATTERN.matcher(request.getEmail()).matches()) {
             throw new IllegalArgumentException("Email format is invalid");
+        }
+
+        // Validate phone number
+        if (request.getContact() == null || request.getContact().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone number must not be empty");
+        } else if (!EmailPattern.PHONE_PATTERN.matcher(request.getContact()).matches()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone number must start with 08 and have 9 to 12 digits");
         }
     }
 

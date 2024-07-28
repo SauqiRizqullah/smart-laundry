@@ -13,6 +13,8 @@ import com.gruptiga.smartlaundry.entity.ServiceType;
 import com.gruptiga.smartlaundry.entity.Transaction;
 import com.gruptiga.smartlaundry.service.AccountService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,6 +62,11 @@ public class AccountController {
             @RequestParam String email
     ) {
         Account account = accountService.getByEmail(email);
+
+        account.setTransactions(null);
+        account.setServiceTypes(null);
+        account.setCustomers(null);
+
         CommonResponse<Account> response = CommonResponse.<Account>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Data akun laundry berhasil didapatkan!!!")
@@ -69,23 +76,6 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(APIUrl.CUSTOMER_ACCOUNT)
-    public ResponseEntity<List<Customer>> getCustomersByEmail(@RequestParam String email) {
-        List<Customer> customers = accountService.getCustomersByEmail(email);
-        return new ResponseEntity<>(customers, HttpStatus.OK);
-    }
-
-    @GetMapping(APIUrl.SERVICETYPE_ACCOUNT)
-    public ResponseEntity<List<ServiceType>> getServiceTypesByEmail(@RequestParam String email) {
-        List<ServiceType> serviceTypes = accountService.getServiceTypesByEmail(email);
-        return new ResponseEntity<>(serviceTypes, HttpStatus.OK);
-    }
-
-    @GetMapping(APIUrl.TRANSACTION_ACCOUNT)
-    public ResponseEntity<List<Transaction>> getTransactions(@RequestParam String email) {
-        List<Transaction> transactions = accountService.findTransactionsByAccountEmail(email);
-        return new ResponseEntity<>(transactions, HttpStatus.OK);
-    }
 
     @PutMapping(APIUrl.UPDATE)
     public ResponseEntity<String> updateAccount(@RequestParam String email, @RequestBody AccountRequest request) {
@@ -97,28 +87,49 @@ public class AccountController {
         }
     }
 
+    @GetMapping(APIUrl.CUSTOMER_ACCOUNT)
+    public ResponseEntity<Page<Customer>> getCustomersByEmail(@RequestParam String email, Pageable pageable) {
+        Page<Customer> customers = accountService.getCustomersByEmail(email, pageable);
+        return new ResponseEntity<>(customers, HttpStatus.OK);
+    }
+
+    @GetMapping(APIUrl.SERVICETYPE_ACCOUNT)
+    public ResponseEntity<Page<ServiceType>> getServiceTypesByEmail(@RequestParam String email, Pageable pageable) {
+        Page<ServiceType> serviceTypes = accountService.getServiceTypesByEmail(email, pageable);
+        return new ResponseEntity<>(serviceTypes, HttpStatus.OK);
+    }
+
+    @GetMapping(APIUrl.TRANSACTION_ACCOUNT)
+    public ResponseEntity<Page<Transaction>> getTransactions(@RequestParam String email, Pageable pageable) {
+        Page<Transaction> transactions = accountService.getTransactionsByAccountEmail(email, pageable);
+        return new ResponseEntity<>(transactions, HttpStatus.OK);
+    }
+
     @GetMapping(APIUrl.BYSTATUSPembayaran_ACCOUNT)
-    public ResponseEntity<List<Transaction>> getTransactionsByAccountEmailAndStatusPembayaran(
+    public ResponseEntity<Page<Transaction>> getTransactionsByAccountEmailAndStatusPembayaran(
             @RequestParam String email,
-            @RequestParam STATUS_PEMBAYARAN statusPembayaran) {
-        List<Transaction> transactions = accountService.getTransactionsByAccountEmailAndStatusPembayaran(email, statusPembayaran);
+            @RequestParam STATUS_PEMBAYARAN statusPembayaran,
+            Pageable pageable) {
+        Page<Transaction> transactions = accountService.getTransactionsByAccountEmailAndStatusPembayaran(email, statusPembayaran, pageable);
         return ResponseEntity.ok(transactions);
     }
 
     @GetMapping(APIUrl.BYSTATUS_ACCOUNT)
-    public ResponseEntity<List<Transaction>> getTransactionsByAccountEmailAndStatus(
-            @RequestParam String email,
-            @RequestParam Status status) {
-        List<Transaction> transactions = accountService.getTransactionsByAccountEmailAndStatus(email, status);
-        return ResponseEntity.ok(transactions);
-    }
-    @GetMapping(APIUrl.BYSTATUS_Pembayaran_ACCOUNT)
-    public ResponseEntity<List<Transaction>> getTransactionsByAccountEmailAndStatusAndPembayaran(
+    public ResponseEntity<Page<Transaction>> getTransactionsByAccountEmailAndStatus(
             @RequestParam String email,
             @RequestParam Status status,
-            @RequestParam STATUS_PEMBAYARAN statusPembayaran
-            ) {
-        List<Transaction> transactions = accountService.getTransactionsByAccountEmailAndStatusAndStatusPembayaran(email, status, statusPembayaran);
+            Pageable pageable) {
+        Page<Transaction> transactions = accountService.getTransactionsByAccountEmailAndStatus(email, status, pageable);
+        return ResponseEntity.ok(transactions);
+    }
+
+    @GetMapping(APIUrl.BYSTATUS_Pembayaran_ACCOUNT)
+    public ResponseEntity<Page<Transaction>> getTransactionsByAccountEmailAndStatusAndPembayaran(
+            @RequestParam String email,
+            @RequestParam Status status,
+            @RequestParam STATUS_PEMBAYARAN statusPembayaran,
+            Pageable pageable) {
+        Page<Transaction> transactions = accountService.getTransactionsByAccountEmailAndStatusAndStatusPembayaran(email, status, statusPembayaran, pageable);
         return ResponseEntity.ok(transactions);
     }
 }

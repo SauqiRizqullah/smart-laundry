@@ -56,4 +56,7 @@ public class Transaction {
 
     @Column(name = "status_pembayaran")
     private STATUS_PEMBAYARAN statusPembayaran;
+
+    @Column(name = "payment_url")
+    private String payment_url;
 }

@@ -114,6 +114,10 @@ public class TransactionServiceImpl implements TransactionService {
                     Map<String, Object> action = actions.get(0);
                     String qrCodeUrl = (String) action.get("url");
 
+                    savedTransaction.setPayment_url(qrCodeUrl);
+
+                    transactionRepository.save(savedTransaction);
+
                     // Build and return response with QR code URL
                     return TransactionResponse.builder()
                             .accountId(savedTransaction.getAccount().getAccountId())
@@ -222,6 +226,7 @@ public class TransactionServiceImpl implements TransactionService {
                         .totalPrice(trx.getTotalPrice())
                         .payment(trx.getPayment().toString())
                         .orderDate(trx.getOrderDate())
+                        .paymentUrl(trx.getPayment_url())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -259,6 +264,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .payment(transaction.getPayment().toString())
                 .orderDate(transaction.getOrderDate())
                 .statusPembayaran(String.valueOf(transaction.getStatusPembayaran()))
+                .paymentUrl(transaction.getPayment_url())
                 .build();
         // buat get by tanggal dan akun untuk transaksi
 
@@ -288,6 +294,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .payment(transaction.getPayment().toString())
                 .orderDate(transaction.getOrderDate())
                 .statusPembayaran(String.valueOf(transaction.getStatusPembayaran()))
+                .paymentUrl(transaction.getPayment_url())
                 .build();
     }
 
@@ -321,6 +328,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .payment(Payment.valueOf(request.getPayment()))
                 .orderDate(localDate)
                 .statusPembayaran(STATUS_PEMBAYARAN.SUDAH_DIBAYAR)
+                .payment_url("CASH Tidak ada URl")
                 .build();
 
 

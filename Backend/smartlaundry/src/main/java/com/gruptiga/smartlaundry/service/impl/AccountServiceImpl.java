@@ -17,6 +17,8 @@ import com.gruptiga.smartlaundry.service.AccountService;
 import com.gruptiga.smartlaundry.specification.AccountSpecification;
 import com.gruptiga.smartlaundry.validation.AccountValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -106,25 +108,9 @@ public class AccountServiceImpl implements AccountService {
         );
     }
 
-    @Override
-    public List<Transaction> findTransactionsByAccountEmail(String email) {
-        return accountRepository.findTransactionsByAccountEmail(email);
-    }
 
-    @Override
-    public List<Transaction> getTransactionsByAccountEmailAndStatusPembayaran(String email, STATUS_PEMBAYARAN statusPembayaran) {
-        return accountRepository.findTransactionsByAccountEmailAndStatusPembayaran(email, statusPembayaran);
-    }
 
-    @Override
-    public List<Transaction> getTransactionsByAccountEmailAndStatus(String email, Status status) {
-        return accountRepository.findTransactionsByAccountEmailAndStatus(email, status);
-    }
 
-    @Override
-    public List<Transaction> getTransactionsByAccountEmailAndStatusAndStatusPembayaran(String email, Status status, STATUS_PEMBAYARAN statusPembayaran) {
-        return accountRepository.findTransactionsByAccountEmailAndStatusANDStatusPembayaran(email, status, statusPembayaran);
-    }
 
     @Override
     public List<AccountResponse> getAllAccounts(SearchAccountRequest accountRequest) {
@@ -148,13 +134,33 @@ public class AccountServiceImpl implements AccountService {
 
 
     @Override
-    public List<Customer> getCustomersByEmail(String email) {
-        return accountRepository.findCustomersByAccountEmail(email);
+    public Page<Customer> getCustomersByEmail(String email, Pageable pageable) {
+        return accountRepository.findCustomersByAccountEmail(email, pageable);
     }
 
     @Override
-    public List<ServiceType> getServiceTypesByEmail(String email) {
-        return accountRepository.findServiceTypesByAccountEmail(email);
+    public Page<ServiceType> getServiceTypesByEmail(String email, Pageable pageable) {
+        return accountRepository.findServiceTypesByAccountEmail(email, pageable);
+    }
+
+    @Override
+    public Page<Transaction> getTransactionsByAccountEmail(String email, Pageable pageable) {
+        return accountRepository.findTransactionsByAccountEmail(email, pageable);
+    }
+
+    @Override
+    public Page<Transaction> getTransactionsByAccountEmailAndStatusPembayaran(String email, STATUS_PEMBAYARAN statusPembayaran, Pageable pageable) {
+        return accountRepository.findTransactionsByAccountEmailAndStatusPembayaran(email, statusPembayaran, pageable);
+    }
+
+    @Override
+    public Page<Transaction> getTransactionsByAccountEmailAndStatus(String email, Status status, Pageable pageable) {
+        return accountRepository.findTransactionsByAccountEmailAndStatus(email, status, pageable);
+    }
+
+    @Override
+    public Page<Transaction> getTransactionsByAccountEmailAndStatusAndStatusPembayaran(String email, Status status, STATUS_PEMBAYARAN statusPembayaran, Pageable pageable) {
+        return accountRepository.findTransactionsByAccountEmailAndStatusANDStatusPembayaran(email, status, statusPembayaran, pageable);
     }
 
 

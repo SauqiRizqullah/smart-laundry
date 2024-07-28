@@ -5,6 +5,9 @@ public class APIUrl {
         public static final String CUSTOMER = BASE_API + "/customers";
         public static final String PATH_VAR_CUSTOMER_ID = "/{customerId}";
 
+        //Update
+        public static final String UPDATE = "/update";
+
         // Account
         public static final String ACCOUNT = BASE_API + "/accounts";
         public static final String CUSTOMER_ACCOUNT = "/customers";
@@ -16,6 +19,7 @@ public class APIUrl {
         public static final String PATH_VAR_ACCOUNT_ID = "/{accountId}";
         public static final String ACCOUNT_BY_EMAIL = "/by-email";
         public static final String BY_DATE_ACCOUNT = "/by-date-and-account";
+        public static final String UPDATE_ACCOUNTS = UPDATE + "/accounts";
 
         // Service Type
         public static final String SERVICETYPE = BASE_API + "/servicestype";
@@ -38,8 +42,6 @@ public class APIUrl {
         //Midtrans
         public static final String MIDTRANS = BASE_API + "/midtrans";
 
-        //Update
-        public static final String UPDATE = BASE_API + "/update";
 }
 
 
