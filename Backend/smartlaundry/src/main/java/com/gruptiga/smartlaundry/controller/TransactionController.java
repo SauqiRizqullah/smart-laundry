@@ -11,6 +11,7 @@ import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
 import com.gruptiga.smartlaundry.dto.response.TransactionResponse;
 import com.gruptiga.smartlaundry.service.TransactionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -90,13 +91,16 @@ public class TransactionController {
     }
 
     @GetMapping(APIUrl.BY_DATE_ACCOUNT)
-    public ResponseEntity<List<TransactionResponse>> getByDateAndAccount(
+    public ResponseEntity<Page<TransactionResponse>> getByDateAndAccount(
             @RequestParam(name = "date") String date,
-            @RequestParam(name = "email") String email) {
+            @RequestParam(name = "email") String email,
+            @RequestParam(name = "keyword", defaultValue = "") String keyword,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
 
         LocalDate orderDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
 
-        List<TransactionResponse> transactions = transactionService.getByDateAndAccount(orderDate.toString(), email);
+        Page<TransactionResponse> transactions = transactionService.getByDateAndAccount(orderDate.toString(), email, keyword, page, size);
 
         return ResponseEntity.ok(transactions);
     }

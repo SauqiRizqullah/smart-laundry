@@ -5,6 +5,9 @@ import com.gruptiga.smartlaundry.constant.Status;
 import com.gruptiga.smartlaundry.dto.request.AccountRequest;
 import com.gruptiga.smartlaundry.dto.request.SearchAccountRequest;
 import com.gruptiga.smartlaundry.dto.response.AccountResponse;
+import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
+import com.gruptiga.smartlaundry.dto.response.ServiceTypeResponse;
+import com.gruptiga.smartlaundry.dto.response.TransactionResponse;
 import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.entity.Customer;
 import com.gruptiga.smartlaundry.entity.ServiceType;
@@ -21,16 +24,16 @@ public interface AccountService {
     List<AccountResponse> getAllAccounts(SearchAccountRequest accountRequest);
     long count();
     void updateAccount(String email, AccountRequest request);
-    Page<Customer> getCustomersByEmail(String email, Pageable pageable);
+    Page<CustomerResponse> getCustomersByEmailAndKeyword(String email, String keyword, int page, int size);
 
-    Page<ServiceType> getServiceTypesByEmail(String email, Pageable pageable);
+    Page<ServiceTypeResponse> getServiceTypesByEmailAndKeyword(String email, String keyword, int page, int size);
 
-    Page<Transaction> getTransactionsByAccountEmail(String email, Pageable pageable);
+    Page<TransactionResponse> getTransactionsByEmailAndKeyword(String email, String keyword, int page, int size);
 
-    Page<Transaction> getTransactionsByAccountEmailAndStatusPembayaran(String email, STATUS_PEMBAYARAN statusPembayaran, Pageable pageable);
+    Page<TransactionResponse> getTransactionsByEmailStatusPembayaranAndKeyword(String email, STATUS_PEMBAYARAN statusPembayaran, String keyword, int page, int size);
 
-    Page<Transaction> getTransactionsByAccountEmailAndStatus(String email, Status status, Pageable pageable);
+    Page<TransactionResponse> getTransactionsByEmailStatusAndKeyword(String email, Status status, String keyword, int page, int size);
 
-    Page<Transaction> getTransactionsByAccountEmailAndStatusAndStatusPembayaran(String email, Status status, STATUS_PEMBAYARAN statusPembayaran, Pageable pageable);
+    Page<TransactionResponse> getTransactionsByEmailStatusStatusPembayaranAndKeyword(String email, Status status, STATUS_PEMBAYARAN statusPembayaran, String keyword, int page, int size);
 
 }

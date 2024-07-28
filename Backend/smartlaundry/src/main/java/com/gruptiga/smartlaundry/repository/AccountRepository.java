@@ -37,21 +37,21 @@ public interface AccountRepository extends JpaRepository<Account, String>, JpaSp
             @Param("password") String password
     );
 
-    @Query("SELECT c FROM Customer c WHERE c.account.email = :email")
-    Page<Customer> findCustomersByAccountEmail(@Param("email") String email, Pageable pageable);
+    @Query("SELECT c FROM Customer c WHERE c.account.email = :email AND (c.name LIKE %:keyword% OR c.customerId LIKE %:keyword%)")
+    Page<Customer> findCustomersByAccountEmailAndKeyword(@Param("email") String email, @Param("keyword") String keyword, Pageable pageable);
 
-    @Query("SELECT s FROM ServiceType s WHERE s.account.email = :email")
-    Page<ServiceType> findServiceTypesByAccountEmail(@Param("email") String email, Pageable pageable);
+    @Query("SELECT s FROM ServiceType s WHERE s.account.email = :email AND (s.serviceTypeId LIKE %:keyword% OR s.service LIKE %:keyword%)")
+    Page<ServiceType> findServiceTypesByAccountEmailAndKeyword(@Param("email") String email, @Param("keyword") String keyword, Pageable pageable);
 
-    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email")
-    Page<Transaction> findTransactionsByAccountEmail(@Param("email") String email, Pageable pageable);
+    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND (t.trxId LIKE %:keyword% OR t.customerId LIKE %:keyword% OR t.serviceTypeId LIKE %:keyword%)")
+    Page<Transaction> findTransactionsByAccountEmailAndKeyword(@Param("email") String email, @Param("keyword") String keyword, Pageable pageable);
 
-    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.statusPembayaran = :statusPembayaran")
-    Page<Transaction> findTransactionsByAccountEmailAndStatusPembayaran(@Param("email") String email, @Param("statusPembayaran") STATUS_PEMBAYARAN statusPembayaran, Pageable pageable);
+    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.statusPembayaran = :statusPembayaran AND (t.trxId LIKE %:keyword% OR t.customerId LIKE %:keyword% OR t.serviceTypeId LIKE %:keyword%)")
+    Page<Transaction> findTransactionsByAccountEmailAndStatusPembayaranAndKeyword(@Param("email") String email, @Param("statusPembayaran") STATUS_PEMBAYARAN statusPembayaran, @Param("keyword") String keyword, Pageable pageable);
 
-    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.status = :status")
-    Page<Transaction> findTransactionsByAccountEmailAndStatus(@Param("email") String email, @Param("status") Status status, Pageable pageable);
+    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.status = :status AND (t.trxId LIKE %:keyword% OR t.customerId LIKE %:keyword% OR t.serviceTypeId LIKE %:keyword%)")
+    Page<Transaction> findTransactionsByAccountEmailAndStatusAndKeyword(@Param("email") String email, @Param("status") Status status, @Param("keyword") String keyword, Pageable pageable);
 
-    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.status = :status AND t.statusPembayaran = :statusPembayaran")
-    Page<Transaction> findTransactionsByAccountEmailAndStatusANDStatusPembayaran(@Param("email") String email, @Param("status") Status status, @Param("statusPembayaran") STATUS_PEMBAYARAN statusPembayaran, Pageable pageable);
+    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.status = :status AND t.statusPembayaran = :statusPembayaran AND (t.trxId LIKE %:keyword% OR t.customerId LIKE %:keyword% OR t.serviceTypeId LIKE %:keyword%)")
+    Page<Transaction> findTransactionsByAccountEmailAndStatusAndStatusPembayaranAndKeyword(@Param("email") String email, @Param("status") Status status, @Param("statusPembayaran") STATUS_PEMBAYARAN statusPembayaran, @Param("keyword") String keyword, Pageable pageable);
 }

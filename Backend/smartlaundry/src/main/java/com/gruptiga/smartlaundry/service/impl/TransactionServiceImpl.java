@@ -16,6 +16,10 @@ import com.gruptiga.smartlaundry.validation.TransactionValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -203,21 +207,24 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<TransactionResponse> getByDateAndAccount(String date, String email) {
+    public Page<TransactionResponse> getByDateAndAccount(String date, String email, String keyword, int page, int size) {
         // Get account by email
         Account account = accountService.getByEmail(email);
 
         // Convert date string to LocalDate
         LocalDate orderDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
 
-        // Get transactions by accountId and orderDate
-        List<Transaction> transactions = transactionRepository.findTransactionsByAccountIdAndOrderDate(
-                account.getAccountId(), orderDate);
+        // Create pageable object
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Get transactions by accountId, orderDate, and keyword
+        Page<Transaction> transactionPage = transactionRepository.findTransactionsByAccountIdAndOrderDateAndKeyword(
+                account.getAccountId(), orderDate, keyword, pageable);
 
         // Convert Transaction entities to TransactionResponse DTOs
-        return transactions.stream()
+        List<TransactionResponse> transactionResponses = transactionPage.stream()
                 .map(trx -> TransactionResponse.builder()
-                        .accountId(trx.getAccount() != null ? trx.getAccount().getAccountId() : null) // Ensure accountId is set
+                        .accountId(trx.getAccount() != null ? trx.getAccount().getAccountId() : null)
                         .trxId(trx.getTrxId())
                         .customerId(trx.getCustomerId())
                         .serviceTypeId(trx.getServiceTypeId())
@@ -229,6 +236,9 @@ public class TransactionServiceImpl implements TransactionService {
                         .paymentUrl(trx.getPayment_url())
                         .build())
                 .collect(Collectors.toList());
+
+        // Return a page of TransactionResponse
+        return new PageImpl<>(transactionResponses, pageable, transactionPage.getTotalElements());
     }
 
 

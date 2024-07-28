@@ -5,8 +5,7 @@ import com.gruptiga.smartlaundry.constant.STATUS_PEMBAYARAN;
 import com.gruptiga.smartlaundry.constant.Status;
 import com.gruptiga.smartlaundry.dto.request.AccountRequest;
 import com.gruptiga.smartlaundry.dto.request.SearchAccountRequest;
-import com.gruptiga.smartlaundry.dto.response.AccountResponse;
-import com.gruptiga.smartlaundry.dto.response.CommonResponse;
+import com.gruptiga.smartlaundry.dto.response.*;
 import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.entity.Customer;
 import com.gruptiga.smartlaundry.entity.ServiceType;
@@ -88,48 +87,66 @@ public class AccountController {
     }
 
     @GetMapping(APIUrl.CUSTOMER_ACCOUNT)
-    public ResponseEntity<Page<Customer>> getCustomersByEmail(@RequestParam String email, Pageable pageable) {
-        Page<Customer> customers = accountService.getCustomersByEmail(email, pageable);
-        return new ResponseEntity<>(customers, HttpStatus.OK);
+    public ResponseEntity<Page<CustomerResponse>> getCustomersByEmail(
+            @RequestParam(name = "email") String email,
+            @RequestParam(name = "keyword", defaultValue = "") String keyword,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
+        Page<CustomerResponse> customers = accountService.getCustomersByEmailAndKeyword(email, keyword, page, size);
+        return ResponseEntity.ok(customers);
     }
 
     @GetMapping(APIUrl.SERVICETYPE_ACCOUNT)
-    public ResponseEntity<Page<ServiceType>> getServiceTypesByEmail(@RequestParam String email, Pageable pageable) {
-        Page<ServiceType> serviceTypes = accountService.getServiceTypesByEmail(email, pageable);
-        return new ResponseEntity<>(serviceTypes, HttpStatus.OK);
+    public ResponseEntity<Page<ServiceTypeResponse>> getServiceTypesByEmail(
+            @RequestParam(name = "email") String email,
+            @RequestParam(name = "keyword", defaultValue = "") String keyword,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
+        Page<ServiceTypeResponse> serviceTypes = accountService.getServiceTypesByEmailAndKeyword(email, keyword, page, size);
+        return ResponseEntity.ok(serviceTypes);
     }
 
     @GetMapping(APIUrl.TRANSACTION_ACCOUNT)
-    public ResponseEntity<Page<Transaction>> getTransactions(@RequestParam String email, Pageable pageable) {
-        Page<Transaction> transactions = accountService.getTransactionsByAccountEmail(email, pageable);
-        return new ResponseEntity<>(transactions, HttpStatus.OK);
+    public ResponseEntity<Page<TransactionResponse>> getTransactionsByEmail(
+            @RequestParam(name = "email") String email,
+            @RequestParam(name = "keyword", defaultValue = "") String keyword,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
+        Page<TransactionResponse> transactions = accountService.getTransactionsByEmailAndKeyword(email, keyword, page, size);
+        return ResponseEntity.ok(transactions);
     }
 
     @GetMapping(APIUrl.BYSTATUSPembayaran_ACCOUNT)
-    public ResponseEntity<Page<Transaction>> getTransactionsByAccountEmailAndStatusPembayaran(
-            @RequestParam String email,
-            @RequestParam STATUS_PEMBAYARAN statusPembayaran,
-            Pageable pageable) {
-        Page<Transaction> transactions = accountService.getTransactionsByAccountEmailAndStatusPembayaran(email, statusPembayaran, pageable);
+    public ResponseEntity<Page<TransactionResponse>> getTransactionsByEmailAndStatusPembayaran(
+            @RequestParam(name = "email") String email,
+            @RequestParam(name = "statusPembayaran") STATUS_PEMBAYARAN statusPembayaran,
+            @RequestParam(name = "keyword", defaultValue = "") String keyword,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
+        Page<TransactionResponse> transactions = accountService.getTransactionsByEmailStatusPembayaranAndKeyword(email, statusPembayaran, keyword, page, size);
         return ResponseEntity.ok(transactions);
     }
 
     @GetMapping(APIUrl.BYSTATUS_ACCOUNT)
-    public ResponseEntity<Page<Transaction>> getTransactionsByAccountEmailAndStatus(
-            @RequestParam String email,
-            @RequestParam Status status,
-            Pageable pageable) {
-        Page<Transaction> transactions = accountService.getTransactionsByAccountEmailAndStatus(email, status, pageable);
+    public ResponseEntity<Page<TransactionResponse>> getTransactionsByEmailAndStatus(
+            @RequestParam(name = "email") String email,
+            @RequestParam(name = "status") Status status,
+            @RequestParam(name = "keyword", defaultValue = "") String keyword,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
+        Page<TransactionResponse> transactions = accountService.getTransactionsByEmailStatusAndKeyword(email, status, keyword, page, size);
         return ResponseEntity.ok(transactions);
     }
 
     @GetMapping(APIUrl.BYSTATUS_Pembayaran_ACCOUNT)
-    public ResponseEntity<Page<Transaction>> getTransactionsByAccountEmailAndStatusAndPembayaran(
-            @RequestParam String email,
-            @RequestParam Status status,
-            @RequestParam STATUS_PEMBAYARAN statusPembayaran,
-            Pageable pageable) {
-        Page<Transaction> transactions = accountService.getTransactionsByAccountEmailAndStatusAndStatusPembayaran(email, status, statusPembayaran, pageable);
+    public ResponseEntity<Page<TransactionResponse>> getTransactionsByEmailStatusAndStatusPembayaran(
+            @RequestParam(name = "email") String email,
+            @RequestParam(name = "status") Status status,
+            @RequestParam(name = "statusPembayaran") STATUS_PEMBAYARAN statusPembayaran,
+            @RequestParam(name = "keyword", defaultValue = "") String keyword,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
+        Page<TransactionResponse> transactions = accountService.getTransactionsByEmailStatusStatusPembayaranAndKeyword(email, status, statusPembayaran, keyword, page, size);
         return ResponseEntity.ok(transactions);
     }
 }

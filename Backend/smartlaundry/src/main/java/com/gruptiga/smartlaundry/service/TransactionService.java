@@ -5,6 +5,7 @@ import com.gruptiga.smartlaundry.dto.request.SearchTransactionRequest;
 import com.gruptiga.smartlaundry.dto.request.TransactionRequest;
 import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
 import com.gruptiga.smartlaundry.dto.response.TransactionResponse;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public interface TransactionService {
 
     TransactionResponse updateStatusPembayaranExpired(String id);
 
-    List<TransactionResponse> getByDateAndAccount(String date, String email);
+    Page<TransactionResponse> getByDateAndAccount(String date, String email, String keyword, int page, int size);
 
     List<TransactionResponse> getAllTransactionsBaru(SearchTransactionRequest request);
     TransactionResponse deleteById(String transactionId);

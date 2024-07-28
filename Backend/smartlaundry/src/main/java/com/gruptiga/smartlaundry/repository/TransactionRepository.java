@@ -1,6 +1,8 @@
 package com.gruptiga.smartlaundry.repository;
 
 import com.gruptiga.smartlaundry.entity.Transaction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -20,10 +22,13 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     @Query(value = "UPDATE Transaction t SET t.status = :newStatus WHERE t.trxId = :id")
     void updateStatusById(@Param("id")String id, @Param("newStatus") String newStatus);
 
-    @Query("SELECT t FROM Transaction t WHERE t.account.id = :accountId AND t.orderDate = :orderDate")
-    List<Transaction> findTransactionsByAccountIdAndOrderDate(
+    @Query("SELECT t FROM Transaction t WHERE t.account.id = :accountId AND t.orderDate = :orderDate AND " +
+            "(t.customerId LIKE %:keyword% OR t.serviceTypeId LIKE %:keyword%)")
+    Page<Transaction> findTransactionsByAccountIdAndOrderDateAndKeyword(
             @Param("accountId") String accountId,
-            @Param("orderDate") LocalDate orderDate
+            @Param("orderDate") LocalDate orderDate,
+            @Param("keyword") String keyword,
+            Pageable pageable
     );
 
 }

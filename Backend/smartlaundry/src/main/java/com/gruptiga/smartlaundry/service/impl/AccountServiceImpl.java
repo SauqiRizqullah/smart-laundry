@@ -8,16 +8,24 @@ import com.gruptiga.smartlaundry.dto.request.SearchAccountRequest;
 import com.gruptiga.smartlaundry.dto.request.SearchCustomerRequest;
 import com.gruptiga.smartlaundry.dto.response.AccountResponse;
 import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
+import com.gruptiga.smartlaundry.dto.response.ServiceTypeResponse;
+import com.gruptiga.smartlaundry.dto.response.TransactionResponse;
 import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.entity.Customer;
 import com.gruptiga.smartlaundry.entity.ServiceType;
 import com.gruptiga.smartlaundry.entity.Transaction;
 import com.gruptiga.smartlaundry.repository.AccountRepository;
+import com.gruptiga.smartlaundry.repository.CustomerRepository;
+import com.gruptiga.smartlaundry.repository.ServiceTypeRepository;
+import com.gruptiga.smartlaundry.repository.TransactionRepository;
 import com.gruptiga.smartlaundry.service.AccountService;
 import com.gruptiga.smartlaundry.specification.AccountSpecification;
 import com.gruptiga.smartlaundry.validation.AccountValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -29,14 +37,18 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
+
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountValidator accountValidator;
+
+
 
 
     @Override
@@ -134,33 +146,134 @@ public class AccountServiceImpl implements AccountService {
 
 
     @Override
-    public Page<Customer> getCustomersByEmail(String email, Pageable pageable) {
-        return accountRepository.findCustomersByAccountEmail(email, pageable);
+    public Page<CustomerResponse> getCustomersByEmailAndKeyword(String email, String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Customer> customerPage = accountRepository.findCustomersByAccountEmailAndKeyword(email, keyword, pageable);
+
+        List<CustomerResponse> customerResponses = customerPage.stream()
+                .map(c -> CustomerResponse.builder()
+                        .customerId(c.getCustomerId())
+                        .name(c.getName())
+                        .address(c.getAddress())
+                        .phoneNumber(c.getPhoneNumber())
+                        .build())
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(customerResponses, pageable, customerPage.getTotalElements());
     }
 
     @Override
-    public Page<ServiceType> getServiceTypesByEmail(String email, Pageable pageable) {
-        return accountRepository.findServiceTypesByAccountEmail(email, pageable);
+    public Page<ServiceTypeResponse> getServiceTypesByEmailAndKeyword(String email, String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ServiceType> serviceTypePage = accountRepository.findServiceTypesByAccountEmailAndKeyword(email, keyword, pageable);
+
+        List<ServiceTypeResponse> serviceTypeResponses = serviceTypePage.stream()
+                .map(s -> ServiceTypeResponse.builder()
+                        .serviceTypeId(s.getServiceTypeId())
+                        .type(String.valueOf(s.getType()))
+                        .service(s.getService())
+                        .price(s.getPrice())
+                        .detail(String.valueOf(s.getDetail()))
+                        .build())
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(serviceTypeResponses, pageable, serviceTypePage.getTotalElements());
     }
 
     @Override
-    public Page<Transaction> getTransactionsByAccountEmail(String email, Pageable pageable) {
-        return accountRepository.findTransactionsByAccountEmail(email, pageable);
+    public Page<TransactionResponse> getTransactionsByEmailAndKeyword(String email, String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Transaction> transactionPage = accountRepository.findTransactionsByAccountEmailAndKeyword(email, keyword, pageable);
+
+        List<TransactionResponse> transactionResponses = transactionPage.stream()
+                .map(t -> TransactionResponse.builder()
+                        .accountId(t.getAccount() != null ? t.getAccount().getAccountId() : null)
+                        .trxId(t.getTrxId())
+                        .customerId(t.getCustomerId())
+                        .serviceTypeId(t.getServiceTypeId())
+                        .status(t.getStatus().toString())
+                        .qty(t.getQty())
+                        .totalPrice(t.getTotalPrice())
+                        .payment(t.getPayment().toString())
+                        .orderDate(t.getOrderDate())
+                        .paymentUrl(t.getPayment_url())
+                        .statusPembayaran(t.getStatusPembayaran().toString())
+                        .build())
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(transactionResponses, pageable, transactionPage.getTotalElements());
     }
 
     @Override
-    public Page<Transaction> getTransactionsByAccountEmailAndStatusPembayaran(String email, STATUS_PEMBAYARAN statusPembayaran, Pageable pageable) {
-        return accountRepository.findTransactionsByAccountEmailAndStatusPembayaran(email, statusPembayaran, pageable);
+    public Page<TransactionResponse> getTransactionsByEmailStatusPembayaranAndKeyword(String email, STATUS_PEMBAYARAN statusPembayaran, String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Transaction> transactionPage = accountRepository.findTransactionsByAccountEmailAndStatusPembayaranAndKeyword(email, statusPembayaran, keyword, pageable);
+
+        List<TransactionResponse> transactionResponses = transactionPage.stream()
+                .map(t -> TransactionResponse.builder()
+                        .accountId(t.getAccount() != null ? t.getAccount().getAccountId() : null)
+                        .trxId(t.getTrxId())
+                        .customerId(t.getCustomerId())
+                        .serviceTypeId(t.getServiceTypeId())
+                        .status(t.getStatus().toString())
+                        .qty(t.getQty())
+                        .totalPrice(t.getTotalPrice())
+                        .payment(t.getPayment().toString())
+                        .orderDate(t.getOrderDate())
+                        .paymentUrl(t.getPayment_url())
+                        .statusPembayaran(t.getStatusPembayaran().toString())
+                        .build())
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(transactionResponses, pageable, transactionPage.getTotalElements());
     }
 
     @Override
-    public Page<Transaction> getTransactionsByAccountEmailAndStatus(String email, Status status, Pageable pageable) {
-        return accountRepository.findTransactionsByAccountEmailAndStatus(email, status, pageable);
+    public Page<TransactionResponse> getTransactionsByEmailStatusAndKeyword(String email, Status status, String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Transaction> transactionPage = accountRepository.findTransactionsByAccountEmailAndStatusAndKeyword(email, status, keyword, pageable);
+
+        List<TransactionResponse> transactionResponses = transactionPage.stream()
+                .map(t -> TransactionResponse.builder()
+                        .accountId(t.getAccount() != null ? t.getAccount().getAccountId() : null)
+                        .trxId(t.getTrxId())
+                        .customerId(t.getCustomerId())
+                        .serviceTypeId(t.getServiceTypeId())
+                        .status(t.getStatus().toString())
+                        .qty(t.getQty())
+                        .totalPrice(t.getTotalPrice())
+                        .payment(t.getPayment().toString())
+                        .orderDate(t.getOrderDate())
+                        .paymentUrl(t.getPayment_url())
+                        .statusPembayaran(t.getStatusPembayaran().toString())
+                        .build())
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(transactionResponses, pageable, transactionPage.getTotalElements());
     }
 
     @Override
-    public Page<Transaction> getTransactionsByAccountEmailAndStatusAndStatusPembayaran(String email, Status status, STATUS_PEMBAYARAN statusPembayaran, Pageable pageable) {
-        return accountRepository.findTransactionsByAccountEmailAndStatusANDStatusPembayaran(email, status, statusPembayaran, pageable);
+    public Page<TransactionResponse> getTransactionsByEmailStatusStatusPembayaranAndKeyword(String email, Status status, STATUS_PEMBAYARAN statusPembayaran, String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Transaction> transactionPage = accountRepository.findTransactionsByAccountEmailAndStatusAndStatusPembayaranAndKeyword(email, status, statusPembayaran, keyword, pageable);
+
+        List<TransactionResponse> transactionResponses = transactionPage.stream()
+                .map(t -> TransactionResponse.builder()
+                        .accountId(t.getAccount() != null ? t.getAccount().getAccountId() : null)
+                        .trxId(t.getTrxId())
+                        .customerId(t.getCustomerId())
+                        .serviceTypeId(t.getServiceTypeId())
+                        .status(t.getStatus().toString())
+                        .qty(t.getQty())
+                        .totalPrice(t.getTotalPrice())
+                        .payment(t.getPayment().toString())
+                        .orderDate(t.getOrderDate())
+                        .paymentUrl(t.getPayment_url())
+                        .statusPembayaran(t.getStatusPembayaran().toString())
+                        .build())
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(transactionResponses, pageable, transactionPage.getTotalElements());
     }
 
 
