@@ -27,4 +27,6 @@ public interface TransactionService {
 
     TransactionResponse getTransactionById(String trxId);
 
+    TransactionResponse createNewTransactionCash(TransactionRequest request, String email);
+
 }

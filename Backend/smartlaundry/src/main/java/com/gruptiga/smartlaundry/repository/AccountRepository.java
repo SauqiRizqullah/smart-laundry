@@ -22,11 +22,6 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, String>, JpaSpecificationExecutor<Account> {
     Optional<Account> findByEmail(String email);
 
-    @Query("SELECT c FROM Customer c WHERE c.account.email = :email")
-    List<Customer> findCustomersByAccountEmail(@Param("email") String email);
-
-    @Query("SELECT s FROM ServiceType s WHERE s.account.email = :email")
-    List<ServiceType> findServiceTypesByAccountEmail(@Param("email") String email);
 
     boolean existsByEmail(String email);
 
@@ -39,6 +34,12 @@ public interface AccountRepository extends JpaRepository<Account, String>, JpaSp
             @Param("contact") String contact,
             @Param("password") String password
     );
+
+    @Query("SELECT c FROM Customer c WHERE c.account.email = :email")
+    List<Customer> findCustomersByAccountEmail(@Param("email") String email);
+
+    @Query("SELECT s FROM ServiceType s WHERE s.account.email = :email")
+    List<ServiceType> findServiceTypesByAccountEmail(@Param("email") String email);
 
     @Query("SELECT t FROM Transaction t WHERE t.account.email = :email")
     List<Transaction> findTransactionsByAccountEmail(@Param("email") String email);

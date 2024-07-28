@@ -290,4 +290,56 @@ public class TransactionServiceImpl implements TransactionService {
                 .statusPembayaran(String.valueOf(transaction.getStatusPembayaran()))
                 .build();
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public TransactionResponse createNewTransactionCash(TransactionRequest request, String email) {
+
+        transactionValidator.validateCreateTransactionRequest(request);
+
+        // cari objek yang sudah ada
+
+        Account accountss = accountService.getByEmail(email);
+
+
+        // Convert Tanggal
+        Date dateNow = new Date();
+
+        Instant instant = dateNow.toInstant();
+
+        LocalDate localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+
+        // Buat objek transaksi
+
+        Transaction trx = Transaction.builder()
+                .account(accountss)
+                .customerId(request.getCustomersId())
+                .serviceTypeId(request.getServiceTypeId())
+                .status(Status.ANTRIAN)
+                .qty(request.getQty())
+                .totalPrice(Long.valueOf(request.getServicePrice() * request.getQty()))
+                .payment(Payment.valueOf(request.getPayment()))
+                .orderDate(localDate)
+                .statusPembayaran(STATUS_PEMBAYARAN.SUDAH_DIBAYAR)
+                .build();
+
+
+        // Simpan transaksi di database
+
+        Transaction savedTransaction = transactionRepository.save(trx);
+
+        return TransactionResponse.builder()
+                .accountId(savedTransaction.getAccount().getAccountId())
+                .trxId(savedTransaction.getTrxId())
+                .customerId(savedTransaction.getCustomerId())
+                .serviceTypeId(savedTransaction.getServiceTypeId())
+                .status(savedTransaction.getStatus().toString())
+                .qty(savedTransaction.getQty())
+                .totalPrice(savedTransaction.getTotalPrice())
+                .payment(savedTransaction.getPayment().toString())
+                .orderDate(savedTransaction.getOrderDate())
+                .paymentUrl("CASH Tidak ada URl")
+                .statusPembayaran(String.valueOf(savedTransaction.getStatusPembayaran()))
+                .build();
+    }
 }

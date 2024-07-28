@@ -27,11 +27,17 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @PostMapping(produces = "application/json")
-    public TransactionResponse createNewTransaction (
+    public ResponseEntity<TransactionResponse> createNewTransaction(
             @RequestBody TransactionRequest transactionRequest,
-            @RequestParam String email
-    ){
-        return transactionService.createNewTransaction(transactionRequest, email);
+            @RequestParam String email) {
+
+        TransactionResponse response;
+        if ("CASH".equalsIgnoreCase(transactionRequest.getPayment())) {
+            response = transactionService.createNewTransactionCash(transactionRequest, email);
+        } else {
+            response = transactionService.createNewTransaction(transactionRequest, email);
+        }
+        return ResponseEntity.ok(response);
     }
 
 

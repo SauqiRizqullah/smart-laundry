@@ -26,5 +26,4 @@ public class TransactionRequest {
     @NotBlank(message = "Payment wajib diisi!!!")
     private String payment;
 
-
 }
