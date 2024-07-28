@@ -2,6 +2,7 @@ package com.gruptiga.smartlaundry.validation;
 
 import com.gruptiga.smartlaundry.constant.EmailPattern;
 import com.gruptiga.smartlaundry.dto.request.CustomerRequest;
+import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.entity.Customer;
 import com.gruptiga.smartlaundry.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +18,16 @@ public class CustomerValidator {
     @Autowired
     private CustomerRepository customerRepository;
 
-    public void validateDuplicateCustomer(CustomerRequest request) {
-        if (customerRepository.existsByNameAndAddressAndPhoneNumber(
+    public void validateDuplicateCustomer(CustomerRequest request, Account account) {
+        if (customerRepository.existsByNameAndAddressAndPhoneNumberAndAccount(
                 request.getName(),
                 request.getAddress(),
-                request.getPhoneNumber()
+                request.getPhoneNumber(),
+                account
         )) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Customer already exists");
         }
     }
-
     public void validateCustomerRequest(CustomerRequest request) {
         if (request == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request cannot be null");
@@ -58,7 +59,6 @@ public class CustomerValidator {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request cannot be null");
         }
 
-        // Validate customerId
         if (request.getCustomerId() == null || request.getCustomerId().trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer ID must not be empty");
         }

@@ -3,6 +3,7 @@ package com.gruptiga.smartlaundry.validation;
 import com.gruptiga.smartlaundry.constant.Detail;
 import com.gruptiga.smartlaundry.constant.Type;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
+import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.entity.ServiceType;
 import com.gruptiga.smartlaundry.repository.ServiceTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class ServiceTypeValidator {
 
     private static final Pattern DETAIL_PATTERN = Pattern.compile("^[A-Z_]+$");
 
-    public void validateCreateServiceTypeRequest(ServiceTypeRequest request) {
+    public void validateCreateServiceTypeRequest(ServiceTypeRequest request, Account account) {
         if (request == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request cannot be null");
         }
@@ -49,10 +50,11 @@ public class ServiceTypeValidator {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Account email must not be empty");
         }
 
-        boolean exists = serviceTypeRepository.existsByTypeAndServiceAndDetail(
+        boolean exists = serviceTypeRepository.existsByTypeAndServiceAndDetailAndAccount(
                 Type.valueOf(request.getType()),
                 request.getService(),
-                Detail.valueOf(request.getDetail())
+                Detail.valueOf(request.getDetail()),
+                account
         );
         if (exists) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ServiceType with the same type, service, detail, and account already exists");

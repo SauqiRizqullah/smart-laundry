@@ -35,8 +35,9 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
 
     @Override
     public ServiceTypeResponse createServiceType(ServiceTypeRequest serviceTypeRequest) {
-        serviceTypeValidator.validateCreateServiceTypeRequest(serviceTypeRequest);
         Account account = accountService.getByEmail(serviceTypeRequest.getEmail());
+        serviceTypeValidator.validateCreateServiceTypeRequest(serviceTypeRequest, account);
+
 
         ServiceType serviceType = ServiceType.builder()
                 .type(Type.valueOf(serviceTypeRequest.getType()))

@@ -37,10 +37,12 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional
     public CustomerResponse createCustomer(@Valid CustomerRequest request) {
-        customerValidator.validateCustomerRequest(request);
-        customerValidator.validateDuplicateCustomer(request);
 
         Account account = accountService.getByEmail(request.getEmailAccount());
+
+        customerValidator.validateCustomerRequest(request);
+        customerValidator.validateDuplicateCustomer(request, account);
+
 
         Customer customer = Customer.builder()
                 .name(request.getName())
