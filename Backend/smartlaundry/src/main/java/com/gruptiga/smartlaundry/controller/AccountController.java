@@ -1,5 +1,7 @@
 package com.gruptiga.smartlaundry.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gruptiga.smartlaundry.constant.APIUrl;
 import com.gruptiga.smartlaundry.constant.STATUS_PEMBAYARAN;
 import com.gruptiga.smartlaundry.constant.Status;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,6 +29,8 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
+
+    private final ObjectMapper objectMapper;
 
     @GetMapping(path = APIUrl.PATH_VAR_ACCOUNT_ID, produces = "application/json")
     public ResponseEntity<CommonResponse<Account>> getById(@PathVariable String accountId) {
@@ -76,12 +81,29 @@ public class AccountController {
     }
 
 
+//    @PutMapping(APIUrl.UPDATE)
+//    public ResponseEntity<String> updateAccount(@RequestParam String email,
+//                                                @RequestBody AccountRequest request
+//    ) {
+//        try {
+//            accountService.updateAccount(email, request);
+//            return new ResponseEntity<>("Account updated successfully", HttpStatus.OK);
+//        } catch (IllegalArgumentException e) {
+//            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+//        }
+//    }
+
     @PutMapping(APIUrl.UPDATE)
-    public ResponseEntity<String> updateAccount(@RequestParam String email, @RequestBody AccountRequest request) {
+    public ResponseEntity<String> updateAccount(@RequestParam(name = "email") String email,
+                                                @RequestPart(name = "request") String jsonRequest,
+                                                @RequestPart(name = "image")MultipartFile multipartFile
+                                                ) {
         try {
-            accountService.updateAccount(email, request);
+            AccountRequest request = objectMapper.readValue(jsonRequest, new TypeReference<>(){});
+            request.setImage(multipartFile);
+            accountService.updateAccount(email,request);
             return new ResponseEntity<>("Account updated successfully", HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

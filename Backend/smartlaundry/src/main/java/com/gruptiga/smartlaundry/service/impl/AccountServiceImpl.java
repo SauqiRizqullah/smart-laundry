@@ -13,6 +13,7 @@ import com.gruptiga.smartlaundry.repository.CustomerRepository;
 import com.gruptiga.smartlaundry.repository.ServiceTypeRepository;
 import com.gruptiga.smartlaundry.repository.TransactionRepository;
 import com.gruptiga.smartlaundry.service.AccountService;
+import com.gruptiga.smartlaundry.service.ImageService;
 import com.gruptiga.smartlaundry.specification.AccountSpecification;
 import com.gruptiga.smartlaundry.validation.AccountValidator;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,8 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountValidator accountValidator;
+
+    private final ImageService imageService;
 
 
 
@@ -88,12 +91,20 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public void updateAccount(String email, AccountRequest request) {
+
+        Image image = imageService.create(request.getImage());
+
+
         accountValidator.validateAccountRequest(request);
+
+
 
         Optional<Account> existingAccountOptional = accountRepository.findByEmail(email);
         if (!existingAccountOptional.isPresent()) {
             throw new IllegalArgumentException("Account does not exist");
         }
+
+        Account account = existingAccountOptional.get();
 
         if (!email.equals(request.getEmail()) && accountRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("New email is already taken");
@@ -103,15 +114,30 @@ public class AccountServiceImpl implements AccountService {
             throw new IllegalArgumentException("New email format is invalid");
         }
 
-        String hashPassword = passwordEncoder.encode(request.getPassword());
+        Image oldImage = account.getImage();
 
-        accountRepository.updateAccount(
-                email,
-                request.getName(),
-                request.getAddress(),
-                request.getContact(),
-                hashPassword
-        );
+//        String hashPassword = passwordEncoder.encode(request.getPassword());
+//
+//        accountRepository.updateAccount(
+//                email,
+//                request.getName(),
+//                request.getAddress(),
+//                request.getContact(),
+//                hashPassword,
+//                image
+//        );
+
+        account.setImage(image);
+        account.setName(request.getName());
+        account.setAddress(request.getAddress());
+        account.setContact(request.getContact());
+        account.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        accountRepository.save(account);
+
+        if (oldImage != null){
+            imageService.delete(oldImage.getImageId());
+        }
     }
 
 

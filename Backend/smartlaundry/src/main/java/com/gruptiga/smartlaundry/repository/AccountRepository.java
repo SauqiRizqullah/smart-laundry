@@ -25,13 +25,14 @@ public interface AccountRepository extends JpaRepository<Account, String>, JpaSp
     boolean existsByEmail(String email);
 
     @Modifying
-    @Query("UPDATE Account a SET a.name = :name, a.address = :address, a.contact = :contact, a.password = :password WHERE a.email = :email")
+    @Query("UPDATE Account a SET a.name = :name, a.address = :address, a.contact = :contact, a.password = :password, a.image = :image WHERE a.email = :email")
     void updateAccount(
             @Param("email") String email,
             @Param("name") String name,
             @Param("address") String address,
             @Param("contact") String contact,
-            @Param("password") String password
+            @Param("password") String password,
+            @Param("image") Image image
     );
 
     @Query("SELECT c FROM Customer c WHERE c.account.email = :email AND (c.name LIKE %:keyword% OR c.customerId LIKE %:keyword%)")

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Setter
 @Getter
@@ -12,6 +13,9 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class AccountRequest {
+    @NotBlank(message = "Id diisi!!!")
+    private String id;
+
     @NotBlank(message = "Nama laundry wajib diisi!!!")
     private String name;
 
@@ -28,4 +32,6 @@ public class AccountRequest {
 
     @NotBlank(message = "Password akun laundry wajib diisi!!!")
     private String password;
+
+    private MultipartFile image;
 }

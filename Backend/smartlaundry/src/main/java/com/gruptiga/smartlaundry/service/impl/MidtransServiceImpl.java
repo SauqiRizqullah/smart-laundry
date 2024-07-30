@@ -29,9 +29,9 @@ public class MidtransServiceImpl implements MidtransService {
         String jsonRequest = objectMapper.writeValueAsString(transactionRequest);
 
         RequestBody body = RequestBody.create(
-                jsonRequest,
-                MediaType.parse("application/json")
-        );
+                MediaType.parse("application/json"),
+                jsonRequest
+                );
 
         Request request = new Request.Builder()
                 .url(apiUrl + "/charge")

@@ -9,4 +9,5 @@ public class ConstantTable {
     public static final String TRANSACTION = "t_transactions";
     public static final String TRANSACTION_DETAIL = "t_transactions_detail";
     public static final String BLACKLIST_TOKEN = "m_blacklist_token";
+    public static final String IMAGE = "m_images";
 }

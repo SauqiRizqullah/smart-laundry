@@ -52,6 +52,8 @@ public class APIUrl {
         //Midtrans
         public static final String MIDTRANS = BASE_API + "/midtrans";
 
+    public static final String IMAGE = BASE_API + "/images";
+        public static final String PATH_VAR_IMAGE_ID = "/{imageId}";
 }
 
 

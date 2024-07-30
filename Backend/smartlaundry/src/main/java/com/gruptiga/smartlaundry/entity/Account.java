@@ -42,6 +42,10 @@ public class Account implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @ManyToOne
+    @JoinColumn(name = "image_id")
+    private Image image;
+
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Transaction> transactions;
