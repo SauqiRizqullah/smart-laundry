@@ -8,8 +8,11 @@ import com.gruptiga.smartlaundry.entity.Service;
 import com.gruptiga.smartlaundry.repository.ServiceRepository;
 import com.gruptiga.smartlaundry.service.AccountService;
 import com.gruptiga.smartlaundry.service.ServiceServices;
+import com.gruptiga.smartlaundry.validation.ServiceValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -20,6 +23,8 @@ public class ServiceImpl  implements ServiceServices {
 
     private final ServiceRepository serviceRepository;
     private final AccountService accountService;
+    @Autowired
+    private final ServiceValidator serviceValidator;
 
 
     @Override
@@ -33,6 +38,9 @@ public class ServiceImpl  implements ServiceServices {
                 .name(request.getName())
                 .account(account)
                 .build();
+
+        serviceValidator.validateCreateServiceRequest(request,service);
+
 
         serviceRepository.saveAndFlush(service);
 
@@ -50,11 +58,16 @@ public class ServiceImpl  implements ServiceServices {
     }
 
     @Override
-    public ServicesResponse updateCustomer(Service service) {
-        serviceRepository.findById(service.getServiceId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer ID not found"));
+    @Transactional
+    public ServicesResponse updateService(Service service, ServiceRequest serviceRequest) {
+       Service services = serviceRepository.findById(service.getServiceId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Service ID not found"));
 
-        serviceRepository.saveAndFlush(service);
+
+
+        services.setName(serviceRequest.getName());
+//        serviceValidator.validateUpdateServiceRequest(services);
+        serviceRepository.saveAndFlush(services);
 
         return parseServiceResponse(service);
     }

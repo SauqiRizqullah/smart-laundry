@@ -2,6 +2,7 @@ package com.gruptiga.smartlaundry.service.impl;
 
 import com.gruptiga.smartlaundry.dto.request.CustomerRequest;
 import com.gruptiga.smartlaundry.dto.request.SearchCustomerRequest;
+import com.gruptiga.smartlaundry.dto.request.ServiceRequest;
 import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
 import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.entity.Customer;
@@ -58,11 +59,16 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public CustomerResponse updateCustomer(@Valid Customer customer) {
-        customerValidator.validateUpdateCustomerRequest(customer);
+    public CustomerResponse updateCustomer(@Valid Customer customer, CustomerRequest customerRequest) {
 
-        customerRepository.findById(customer.getCustomerId())
+        Customer customer1 = customerRepository.findById(customer.getCustomerId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer ID not found"));
+
+        customer1.setAddress(customerRequest.getAddress());
+        customer1.setName(customerRequest.getName());
+        customer1.setPhoneNumber(customerRequest.getPhoneNumber());
+
+        customerValidator.validateUpdateCustomerRequest(customer1);
 
         customerRepository.saveAndFlush(customer);
 

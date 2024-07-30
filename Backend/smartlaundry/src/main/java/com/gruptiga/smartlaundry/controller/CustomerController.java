@@ -67,16 +67,16 @@ public class CustomerController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping(produces = "application/json")
+    @PutMapping
     public ResponseEntity<CommonResponse<CustomerResponse>> updateCustomer (
             @RequestBody CustomerRequest customerRequest
     ){
-        Customer customer = customerService.getById(customerRequest.getId());
-        CustomerResponse updatedCustomer = customerService.updateCustomer(customer);
+        Customer customers = customerService.getById(customerRequest.getId());
+        CustomerResponse updatedCustomer = customerService.updateCustomer(customers, customerRequest);
 
         CommonResponse<CustomerResponse> response = CommonResponse.<CustomerResponse>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Data Customer " + customer.getCustomerId() + " telah diperbarui!!!")
+                .message("Data Customer " + customers.getCustomerId() + " telah diperbarui!!!")
                 .data(updatedCustomer)
                 .build();
 

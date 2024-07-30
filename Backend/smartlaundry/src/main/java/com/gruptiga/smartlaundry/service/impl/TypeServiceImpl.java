@@ -8,7 +8,9 @@ import com.gruptiga.smartlaundry.entity.Type;
 import com.gruptiga.smartlaundry.repository.TypeRepository;
 import com.gruptiga.smartlaundry.service.AccountService;
 import com.gruptiga.smartlaundry.service.TypeService;
+import com.gruptiga.smartlaundry.validation.TypeValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,6 +24,9 @@ public class TypeServiceImpl implements TypeService {
 
     private final TypeRepository typeRepository;
     private final AccountService accountService;
+    @Autowired
+    private final TypeValidator typeValidator;
+
 
     @Override
     public TypeResponse createType(TypeRequest request) {
@@ -31,7 +36,7 @@ public class TypeServiceImpl implements TypeService {
                 .name(request.getName())
                 .account(account)
                 .build();
-
+        typeValidator.validateCreateTypeRequest(request,type);
         typeRepository.saveAndFlush(type);
 
         return parseTypeResponse(type);
@@ -48,10 +53,11 @@ public class TypeServiceImpl implements TypeService {
     }
 
     @Override
-    public TypeResponse updateType(Type type) {
+    public TypeResponse updateType(Type type, TypeRequest typeRequest) {
         typeRepository.findById(type.getTypeId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Type ID not found"));
 
+        type.setName(typeRequest.getName());
         typeRepository.saveAndFlush(type);
 
         return parseTypeResponse(type);

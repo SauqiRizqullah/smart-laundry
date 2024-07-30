@@ -13,6 +13,8 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class ServiceTypeRequest {
+    @NotBlank(message = "Id akun laundry wajib diisi!!!")
+    private String serviceTypeId;
 
     @NotBlank(message = "Id akun laundry wajib diisi!!!")
     private String email;

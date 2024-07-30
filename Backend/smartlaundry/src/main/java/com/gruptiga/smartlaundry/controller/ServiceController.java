@@ -68,15 +68,15 @@ public class ServiceController {
 
     @PutMapping
     public ResponseEntity<CommonResponse<ServicesResponse>> updateServices(
-            @RequestBody ServiceRequest service
+            @RequestBody ServiceRequest serviceRequest
     ) {
 
-        Service service1 = serviceServices.getById(service.getServiceId());
-        ServicesResponse updatedService = serviceServices.updateCustomer(service1);
+        Service service1 = serviceServices.getById(serviceRequest.getServiceId());
+        ServicesResponse updatedService = serviceServices.updateService(service1 , serviceRequest );
 
         CommonResponse<ServicesResponse> response = CommonResponse.<ServicesResponse>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Data Service " + service.getName() + " telah diperbarui!!!")
+                .message("Data Service " + serviceRequest.getName() + " telah diperbarui!!!")
                 .data(updatedService)
                 .build();
 

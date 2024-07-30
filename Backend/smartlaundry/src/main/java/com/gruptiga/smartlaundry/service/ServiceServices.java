@@ -16,7 +16,7 @@ public interface ServiceServices {
 
     List<ServicesResponse> getAllServicesByEmail (SearchCustomerRequest request);
 
-    ServicesResponse updateCustomer (Service service);
+    ServicesResponse updateService (Service service, ServiceRequest serviceRequest);
 
     ServicesResponse deleteById(String serviceId);
 

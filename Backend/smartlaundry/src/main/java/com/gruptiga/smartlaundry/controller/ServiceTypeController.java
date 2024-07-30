@@ -92,10 +92,10 @@ public class ServiceTypeController {
 
     @PutMapping(produces = "application/json")
     public ResponseEntity<CommonResponse<ServiceTypeResponse>> updateCustomer (
-            @RequestBody ServiceType serviceType1
+            @RequestBody ServiceTypeRequest serviceType1
     ){
         ServiceType serviceType = typeService.getById(serviceType1.getServiceTypeId());
-        ServiceTypeResponse updatedServiceType = typeService.updateServiceType(serviceType);
+        ServiceTypeResponse updatedServiceType = typeService.updateServiceType(serviceType, serviceType1);
 
         CommonResponse<ServiceTypeResponse> response = CommonResponse.<ServiceTypeResponse>builder()
                 .statusCode(HttpStatus.OK.value())

@@ -73,8 +73,8 @@ public class TypeController {
             @RequestBody TypeRequest typeRequest
     ) {
 
-        Type service1 = typeService.getById(typeRequest.getTypeId());
-        TypeResponse updatedService = typeService.updateType(service1);
+        Type type1 = typeService.getById(typeRequest.getTypeId());
+        TypeResponse updatedService = typeService.updateType(type1 , typeRequest);
 
         CommonResponse<TypeResponse> response = CommonResponse.<TypeResponse>builder()
                 .statusCode(HttpStatus.OK.value())

@@ -14,7 +14,7 @@ public interface TypeService {
 
     List<TypeResponse> getAllType (TypeRequest request);
 
-    TypeResponse updateType (Type type);
+    TypeResponse updateType (Type type, TypeRequest typeRequest);
 
     TypeResponse deleteById(String typeId);
 

@@ -14,7 +14,7 @@ public interface ServiceTypeService {
 
     List<ServiceTypeResponse> getAllServicesType(SearchServiceTypeRequest serviceTypeRequest);
 
-    ServiceTypeResponse updateServiceType (ServiceType serviceType);
+    ServiceTypeResponse updateServiceType (ServiceType serviceType, ServiceTypeRequest serviceTypeRequest);
 
 
     long count();

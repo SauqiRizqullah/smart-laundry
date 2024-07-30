@@ -94,15 +94,21 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
 
     @Override
     @Transactional
-    public ServiceTypeResponse updateServiceType(ServiceType serviceType) {
+    public ServiceTypeResponse updateServiceType(ServiceType serviceType, ServiceTypeRequest serviceTypeRequest) {
         serviceTypeValidator.validateUpdateServiceTypeRequest(serviceType);
 
-        serviceTypeRepository.findById(serviceType.getServiceTypeId())
+       ServiceType serviceType1 = serviceTypeRepository.findById(serviceType.getServiceTypeId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer ID not found"));
+       Type typeService1 = typeService.getById(serviceTypeRequest.getTypeId());
+       com.gruptiga.smartlaundry.entity.Service service = serviceServices.getById(serviceTypeRequest.getServiceId());
 
-        serviceTypeRepository.saveAndFlush(serviceType);
+       serviceType1.setPrice(serviceTypeRequest.getPrice());
+       serviceType1.setType(typeService1);
+       serviceType1.setService(service);
+       serviceType1.setDetail(Detail.valueOf(serviceTypeRequest.getDetail()));
+        serviceTypeRepository.saveAndFlush(serviceType1);
 
-        return parseServiceTypeToServiceTypeResponse(serviceType);
+        return parseServiceTypeToServiceTypeResponse(serviceType1);
     }
 
     @Override

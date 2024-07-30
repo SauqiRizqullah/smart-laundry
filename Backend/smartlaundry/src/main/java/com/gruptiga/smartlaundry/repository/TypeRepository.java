@@ -10,6 +10,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.Optional;
 
 public interface TypeRepository   extends JpaRepository<Type, String>, JpaSpecificationExecutor<Type> {
-//    boolean existsByTypeAndAccount(Type type, Account account);
-//    Optional<Type> findByNameAndAccount(String name, Account account);
+    boolean existsByNameAndAccount(String name, Account account);
 }

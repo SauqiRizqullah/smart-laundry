@@ -14,7 +14,7 @@ public interface CustomerService {
 
     List<CustomerResponse> getAllCustomers (SearchCustomerRequest request);
 
-    CustomerResponse updateCustomer (Customer customer);
+    CustomerResponse updateCustomer (Customer customer, CustomerRequest customerRequest);
 
     CustomerResponse deleteById(String customerId);
 
