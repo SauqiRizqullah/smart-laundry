@@ -1,5 +1,7 @@
 package com.gruptiga.smartlaundry.dto.response;
 
+import com.gruptiga.smartlaundry.entity.Service;
+import com.gruptiga.smartlaundry.entity.Type;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,9 +12,9 @@ import lombok.Setter;
 public class ServiceTypeResponse {
     private String serviceTypeId;
 
-    private String type;
+    private Type type;
 
-    private String service;
+    private Service service;
 
     private Long price;
 

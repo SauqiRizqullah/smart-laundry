@@ -1,7 +1,7 @@
 package com.gruptiga.smartlaundry.service.impl;
 
 import com.gruptiga.smartlaundry.constant.Detail;
-import com.gruptiga.smartlaundry.constant.Type;
+//import com.gruptiga.smartlaundry.constant.Type;
 import com.gruptiga.smartlaundry.dto.request.AccountRequest;
 import com.gruptiga.smartlaundry.dto.request.CustomerRequest;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;

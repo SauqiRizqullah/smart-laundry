@@ -54,6 +54,14 @@ public class Account implements UserDetails {
     @JsonManagedReference
     private List<Customer> customers;
 
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Service> service;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Type> type;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

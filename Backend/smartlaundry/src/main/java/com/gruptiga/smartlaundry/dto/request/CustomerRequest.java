@@ -10,6 +10,8 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class CustomerRequest {
+    @NotBlank(message = "Id diisi!!!")
+    private String id;
 
     @NotBlank(message = "Nama harus diisi!!!")
     private String name;

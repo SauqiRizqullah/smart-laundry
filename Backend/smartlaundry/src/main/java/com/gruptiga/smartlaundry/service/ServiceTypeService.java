@@ -4,8 +4,7 @@ import com.gruptiga.smartlaundry.dto.request.SearchServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
 import com.gruptiga.smartlaundry.dto.response.ServiceTypeResponse;
-import com.gruptiga.smartlaundry.entity.Customer;
-import com.gruptiga.smartlaundry.entity.ServiceType;
+import com.gruptiga.smartlaundry.entity.*;
 
 import java.util.List;
 
@@ -21,4 +20,6 @@ public interface ServiceTypeService {
     long count();
 
     ServiceTypeResponse deleteById(String serviceTypeId);
+
+    ServiceType getServiceTypeByAccountServiceAndType(Account account, Service service, Type type);
 }

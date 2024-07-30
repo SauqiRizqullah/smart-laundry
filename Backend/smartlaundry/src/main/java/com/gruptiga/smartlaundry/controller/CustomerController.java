@@ -69,8 +69,9 @@ public class CustomerController {
 
     @PutMapping(produces = "application/json")
     public ResponseEntity<CommonResponse<CustomerResponse>> updateCustomer (
-            @RequestBody Customer customer
+            @RequestBody CustomerRequest customerRequest
     ){
+        Customer customer = customerService.getById(customerRequest.getId());
         CustomerResponse updatedCustomer = customerService.updateCustomer(customer);
 
         CommonResponse<CustomerResponse> response = CommonResponse.<CustomerResponse>builder()

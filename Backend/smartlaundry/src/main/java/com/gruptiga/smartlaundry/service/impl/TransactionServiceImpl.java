@@ -48,6 +48,9 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
 
     private final AccountService accountService;
+    private final ServiceTypeService serviceType;
+    private final ServiceServices serviceServices;
+    private final TypeService typeService;
 
     @Autowired
     private TransactionValidator transactionValidator;
@@ -70,18 +73,30 @@ public class TransactionServiceImpl implements TransactionService {
         Instant instant = dateNow.toInstant();
         LocalDate localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
 
+        // cari objek yang sudah ada
+
+        Account accountss = accountService.getByEmail(email);
+
+        com.gruptiga.smartlaundry.entity.Service service = serviceServices.getById(request.getServiceId());
+        Type type = typeService.getById(request.getTypeId());
+
+        ServiceType serviceType1 = serviceType.getServiceTypeByAccountServiceAndType(accountss, service, type);
+
+
+
         // Create transaction object
         Transaction trx = Transaction.builder()
                 .account(account)
                 .customerId(request.getCustomersId())
-                .serviceTypeId(request.getServiceTypeId())
+                .serviceTypeId(serviceType1.getServiceTypeId())
                 .status(Status.ANTRIAN)
                 .qty(request.getQty())
-                .totalPrice(Long.valueOf(request.getServicePrice() * request.getQty()))
+                .totalPrice(Long.valueOf(serviceType1.getPrice() * request.getQty()))
                 .payment(Payment.valueOf(request.getPayment()))
                 .orderDate(localDate)
                 .statusPembayaran(STATUS_PEMBAYARAN.BELUM_DIBAYAR)
                 .build();
+
 
         // Save transaction to database
         Transaction savedTransaction = transactionRepository.save(trx);
@@ -127,7 +142,7 @@ public class TransactionServiceImpl implements TransactionService {
                             .accountId(savedTransaction.getAccount().getAccountId())
                             .trxId(savedTransaction.getTrxId())
                             .customerId(savedTransaction.getCustomerId())
-                            .serviceTypeId(savedTransaction.getServiceTypeId())
+                            .serviceType(serviceType1)
                             .status(trx.getStatus().toString())
                             .qty(savedTransaction.getQty())
                             .totalPrice(savedTransaction.getTotalPrice())
@@ -148,24 +163,24 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
-    @Override
-    public List<TransactionResponse> getAllTransactions() {
-
-        // Memanggil repository findAll terlebih dahulu
-        List<Transaction> transactions = transactionRepository.findAll();
-
-
-        return transactions.stream().map(trx ->{
-            return TransactionResponse.builder()
-                    .trxId(trx.getTrxId())
-                    .status(trx.getStatus().toString())
-                    .qty(trx.getQty())
-                    .totalPrice(trx.getTotalPrice())
-                    .payment(trx.getPayment().toString())
-                    .orderDate(trx.getOrderDate())
-                    .build();
-        }).toList();
-    }
+//    @Override
+//    public List<TransactionResponse> getAllTransactions() {
+//
+//        // Memanggil repository findAll terlebih dahulu
+//        List<Transaction> transactions = transactionRepository.findAll();
+//
+//
+//        return transactions.stream().map(trx ->{
+//            return TransactionResponse.builder()
+//                    .trxId(trx.getTrxId())
+//                    .status(trx.getStatus().toString())
+//                    .qty(trx.getQty())
+//                    .totalPrice(trx.getTotalPrice())
+//                    .payment(trx.getPayment().toString())
+//                    .orderDate(trx.getOrderDate())
+//                    .build();
+//        }).toList();
+//    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -221,20 +236,28 @@ public class TransactionServiceImpl implements TransactionService {
         Page<Transaction> transactionPage = transactionRepository.findTransactionsByAccountIdAndOrderDateAndKeyword(
                 account.getAccountId(), orderDate, keyword, pageable);
 
+
+
         // Convert Transaction entities to TransactionResponse DTOs
         List<TransactionResponse> transactionResponses = transactionPage.stream()
-                .map(trx -> TransactionResponse.builder()
-                        .accountId(trx.getAccount() != null ? trx.getAccount().getAccountId() : null)
-                        .trxId(trx.getTrxId())
-                        .customerId(trx.getCustomerId())
-                        .serviceTypeId(trx.getServiceTypeId())
-                        .status(trx.getStatus().toString())
-                        .qty(trx.getQty())
-                        .totalPrice(trx.getTotalPrice())
-                        .payment(trx.getPayment().toString())
-                        .orderDate(trx.getOrderDate())
-                        .paymentUrl(trx.getPayment_url())
-                        .build())
+                .map(trx -> {
+                    // Ambil ServiceType berdasarkan ID
+                    ServiceType serviceType1 = serviceType.getById(trx.getServiceTypeId());
+
+                    // Bangun TransactionResponse
+                    return TransactionResponse.builder()
+                            .accountId(trx.getAccount() != null ? trx.getAccount().getAccountId() : null)
+                            .trxId(trx.getTrxId())
+                            .customerId(trx.getCustomerId())
+                            .serviceType(serviceType1) // ServiceType dari ID
+                            .status(trx.getStatus().toString())
+                            .qty(trx.getQty())
+                            .totalPrice(trx.getTotalPrice())
+                            .payment(trx.getPayment().toString())
+                            .orderDate(trx.getOrderDate())
+                            .paymentUrl(trx.getPayment_url())
+                            .build();
+                })
                 .collect(Collectors.toList());
 
         // Return a page of TransactionResponse
@@ -263,11 +286,14 @@ public class TransactionServiceImpl implements TransactionService {
             id = transaction.getTrxId();
         }
 
+        ServiceType serviceType1 = serviceType.getById(transaction.getServiceTypeId());
+
+
         return TransactionResponse.builder()
                 .accountId(transaction.getAccount() != null ? transaction.getAccount().getAccountId() : null)
                 .trxId(transaction.getTrxId())
                 .customerId(transaction.getCustomerId())
-                .serviceTypeId(transaction.getServiceTypeId())
+                .serviceType(serviceType1)
                 .status(transaction.getStatus().toString())
                 .qty(transaction.getQty())
                 .totalPrice(transaction.getTotalPrice())
@@ -293,11 +319,14 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = transactionRepository.findById(trxId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
 
+        ServiceType serviceType1 = serviceType.getById(transaction.getServiceTypeId());
+
+
         return TransactionResponse.builder()
                 .accountId(transaction.getAccount() != null ? transaction.getAccount().getAccountId() : null)
                 .trxId(transaction.getTrxId())
                 .customerId(transaction.getCustomerId())
-                .serviceTypeId(transaction.getServiceTypeId())
+                .serviceType(serviceType1)
                 .status(transaction.getStatus().toString())
                 .qty(transaction.getQty())
                 .totalPrice(transaction.getTotalPrice())
@@ -318,6 +347,11 @@ public class TransactionServiceImpl implements TransactionService {
 
         Account accountss = accountService.getByEmail(email);
 
+        com.gruptiga.smartlaundry.entity.Service service = serviceServices.getById(request.getServiceId());
+        Type type = typeService.getById(request.getTypeId());
+
+        ServiceType serviceType1 = serviceType.getServiceTypeByAccountServiceAndType(accountss, service, type);
+
 
         // Convert Tanggal
         Date dateNow = new Date();
@@ -331,10 +365,10 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction trx = Transaction.builder()
                 .account(accountss)
                 .customerId(request.getCustomersId())
-                .serviceTypeId(request.getServiceTypeId())
+                .serviceTypeId(serviceType1.getServiceTypeId())
                 .status(Status.ANTRIAN)
                 .qty(request.getQty())
-                .totalPrice(Long.valueOf(request.getServicePrice() * request.getQty()))
+                .totalPrice(Long.valueOf(serviceType1.getPrice() * request.getQty()))
                 .payment(Payment.valueOf(request.getPayment()))
                 .orderDate(localDate)
                 .statusPembayaran(STATUS_PEMBAYARAN.SUDAH_DIBAYAR)
@@ -350,7 +384,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .accountId(savedTransaction.getAccount().getAccountId())
                 .trxId(savedTransaction.getTrxId())
                 .customerId(savedTransaction.getCustomerId())
-                .serviceTypeId(savedTransaction.getServiceTypeId())
+                .serviceType(serviceType1)
                 .status(savedTransaction.getStatus().toString())
                 .qty(savedTransaction.getQty())
                 .totalPrice(savedTransaction.getTotalPrice())

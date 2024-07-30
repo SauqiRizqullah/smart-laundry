@@ -11,11 +11,12 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class TransactionRequest {
-    @NotBlank(message = "Service Price wajib diisi!!!")
-    private Integer servicePrice;
 
-    @NotBlank(message = "Service Type ID wajib diisi!!!")
-    private String serviceTypeId;
+    @NotBlank(message = "Service  ID wajib diisi!!!")
+    private String serviceId;
+
+    @NotBlank(message = "Service  ID wajib diisi!!!")
+    private String typeId;
 
     @NotBlank(message = "Customers ID wajib diisi!!!")
     private String customersId;

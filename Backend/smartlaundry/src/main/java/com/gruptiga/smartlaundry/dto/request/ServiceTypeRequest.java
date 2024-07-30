@@ -1,5 +1,7 @@
 package com.gruptiga.smartlaundry.dto.request;
 
+import com.gruptiga.smartlaundry.entity.Service;
+import com.gruptiga.smartlaundry.entity.Type;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
@@ -16,11 +18,10 @@ public class ServiceTypeRequest {
     private String email;
 
     @NotBlank(message = "Tipe laundry wajib diisi!!!")
-    @Enumerated(EnumType.STRING)
-    private String type;
+    private String typeId;
 
     @NotBlank(message = "Jenis pelayanan wajib diisii!!!")
-    private String service;
+    private String serviceId;
 
     @NotBlank(message = "Harga pelayanan wajib diisi!!!")
     private Long price;

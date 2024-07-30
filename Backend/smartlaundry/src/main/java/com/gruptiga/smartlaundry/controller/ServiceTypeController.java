@@ -3,6 +3,7 @@ package com.gruptiga.smartlaundry.controller;
 import com.gruptiga.smartlaundry.constant.APIUrl;
 import com.gruptiga.smartlaundry.dto.request.SearchServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
+import com.gruptiga.smartlaundry.dto.request.TypeRequest;
 import com.gruptiga.smartlaundry.dto.response.CommonResponse;
 import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
 import com.gruptiga.smartlaundry.dto.response.ServiceTypeResponse;
@@ -46,7 +47,7 @@ public class ServiceTypeController {
 
         CommonResponse<ServiceType> response = CommonResponse.<ServiceType>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Data pelayanan laundry berhasil didapatkan!!!")
+                .message("Data Service Type berhasil didapatkan!!!")
                 .data(serviceType)
                 .build();
 
@@ -91,8 +92,9 @@ public class ServiceTypeController {
 
     @PutMapping(produces = "application/json")
     public ResponseEntity<CommonResponse<ServiceTypeResponse>> updateCustomer (
-            @RequestBody ServiceType serviceType
+            @RequestBody ServiceType serviceType1
     ){
+        ServiceType serviceType = typeService.getById(serviceType1.getServiceTypeId());
         ServiceTypeResponse updatedServiceType = typeService.updateServiceType(serviceType);
 
         CommonResponse<ServiceTypeResponse> response = CommonResponse.<ServiceTypeResponse>builder()

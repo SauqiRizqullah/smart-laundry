@@ -13,7 +13,7 @@ public interface TransactionService {
 
     TransactionResponse createNewTransaction (TransactionRequest request, String email);
 
-    List<TransactionResponse> getAllTransactions();
+//    List<TransactionResponse> getAllTransactions();
 
     TransactionResponse updateStatusDone(String id, Status status);
 

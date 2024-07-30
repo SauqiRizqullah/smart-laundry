@@ -1,10 +1,12 @@
 package com.gruptiga.smartlaundry.validation;
 
 import com.gruptiga.smartlaundry.constant.Detail;
-import com.gruptiga.smartlaundry.constant.Type;
+//import com.gruptiga.smartlaundry.constant.Type;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
 import com.gruptiga.smartlaundry.entity.Account;
+import com.gruptiga.smartlaundry.entity.Service;
 import com.gruptiga.smartlaundry.entity.ServiceType;
+import com.gruptiga.smartlaundry.entity.Type;
 import com.gruptiga.smartlaundry.repository.ServiceTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,16 +23,16 @@ public class ServiceTypeValidator {
 
     private static final Pattern DETAIL_PATTERN = Pattern.compile("^[A-Z_]+$");
 
-    public void validateCreateServiceTypeRequest(ServiceTypeRequest request, Account account) {
+    public void validateCreateServiceTypeRequest(ServiceTypeRequest request, Account account, Service service , Type type) {
         if (request == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request cannot be null");
         }
 
-        if (request.getType() == null || request.getType().trim().isEmpty()) {
+        if (request.getTypeId() == null || request.getServiceId().trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Type must not be empty");
         }
 
-        if (request.getService() == null || request.getService().trim().isEmpty()) {
+        if (request.getServiceId() == null || request.getServiceId().trim().isEmpty() ) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Service must not be empty");
         }
 
@@ -51,8 +53,8 @@ public class ServiceTypeValidator {
         }
 
         boolean exists = serviceTypeRepository.existsByTypeAndServiceAndDetailAndAccount(
-                Type.valueOf(request.getType()),
-                request.getService(),
+                type,
+                service,
                 Detail.valueOf(request.getDetail()),
                 account
         );
@@ -75,12 +77,12 @@ public class ServiceTypeValidator {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ServiceType ID not found");
         }
 
-        if (request.getType() == null || String.valueOf(request.getType()).trim().isEmpty()) {
+        if (request.getType() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Type must not be empty");
         }
 
 
-        if (request.getService() == null || request.getService().trim().isEmpty()) {
+        if (request.getService() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Service must not be empty");
         }
 

@@ -40,7 +40,7 @@ public interface AccountRepository extends JpaRepository<Account, String>, JpaSp
     @Query("SELECT c FROM Customer c WHERE c.account.email = :email AND (c.name LIKE %:keyword% OR c.customerId LIKE %:keyword%)")
     Page<Customer> findCustomersByAccountEmailAndKeyword(@Param("email") String email, @Param("keyword") String keyword, Pageable pageable);
 
-    @Query("SELECT s FROM ServiceType s WHERE s.account.email = :email AND (s.serviceTypeId LIKE %:keyword% OR s.service LIKE %:keyword%)")
+    @Query("SELECT s FROM ServiceType s WHERE s.account.email = :email AND (s.serviceTypeId LIKE %:keyword% OR s.service.serviceId LIKE %:keyword%)")
     Page<ServiceType> findServiceTypesByAccountEmailAndKeyword(@Param("email") String email, @Param("keyword") String keyword, Pageable pageable);
 
     @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND (t.trxId LIKE %:keyword% OR t.customerId LIKE %:keyword% OR t.serviceTypeId LIKE %:keyword%)")

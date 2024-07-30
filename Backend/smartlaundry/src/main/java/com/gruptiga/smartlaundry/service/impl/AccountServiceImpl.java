@@ -10,10 +10,7 @@ import com.gruptiga.smartlaundry.dto.response.AccountResponse;
 import com.gruptiga.smartlaundry.dto.response.CustomerResponse;
 import com.gruptiga.smartlaundry.dto.response.ServiceTypeResponse;
 import com.gruptiga.smartlaundry.dto.response.TransactionResponse;
-import com.gruptiga.smartlaundry.entity.Account;
-import com.gruptiga.smartlaundry.entity.Customer;
-import com.gruptiga.smartlaundry.entity.ServiceType;
-import com.gruptiga.smartlaundry.entity.Transaction;
+import com.gruptiga.smartlaundry.entity.*;
 import com.gruptiga.smartlaundry.repository.AccountRepository;
 import com.gruptiga.smartlaundry.repository.CustomerRepository;
 import com.gruptiga.smartlaundry.repository.ServiceTypeRepository;
@@ -170,7 +167,7 @@ public class AccountServiceImpl implements AccountService {
         List<ServiceTypeResponse> serviceTypeResponses = serviceTypePage.stream()
                 .map(s -> ServiceTypeResponse.builder()
                         .serviceTypeId(s.getServiceTypeId())
-                        .type(String.valueOf(s.getType()))
+//                        .type((Type) s.getTypes())
                         .service(s.getService())
                         .price(s.getPrice())
                         .detail(String.valueOf(s.getDetail()))
@@ -190,7 +187,7 @@ public class AccountServiceImpl implements AccountService {
                         .accountId(t.getAccount() != null ? t.getAccount().getAccountId() : null)
                         .trxId(t.getTrxId())
                         .customerId(t.getCustomerId())
-                        .serviceTypeId(t.getServiceTypeId())
+//                        .serviceTypeId(t.getServiceTypeId())
                         .status(t.getStatus().toString())
                         .qty(t.getQty())
                         .totalPrice(t.getTotalPrice())
@@ -214,7 +211,7 @@ public class AccountServiceImpl implements AccountService {
                         .accountId(t.getAccount() != null ? t.getAccount().getAccountId() : null)
                         .trxId(t.getTrxId())
                         .customerId(t.getCustomerId())
-                        .serviceTypeId(t.getServiceTypeId())
+//                        .serviceTypeId(t.getServiceTypeId())
                         .status(t.getStatus().toString())
                         .qty(t.getQty())
                         .totalPrice(t.getTotalPrice())
@@ -238,7 +235,7 @@ public class AccountServiceImpl implements AccountService {
                         .accountId(t.getAccount() != null ? t.getAccount().getAccountId() : null)
                         .trxId(t.getTrxId())
                         .customerId(t.getCustomerId())
-                        .serviceTypeId(t.getServiceTypeId())
+//                        .serviceTypeId(t.getServiceTypeId())
                         .status(t.getStatus().toString())
                         .qty(t.getQty())
                         .totalPrice(t.getTotalPrice())
@@ -262,7 +259,7 @@ public class AccountServiceImpl implements AccountService {
                         .accountId(t.getAccount() != null ? t.getAccount().getAccountId() : null)
                         .trxId(t.getTrxId())
                         .customerId(t.getCustomerId())
-                        .serviceTypeId(t.getServiceTypeId())
+//                        .serviceTypeId(t.getServiceTypeId())
                         .status(t.getStatus().toString())
                         .qty(t.getQty())
                         .totalPrice(t.getTotalPrice())

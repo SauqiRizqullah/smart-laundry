@@ -1,6 +1,7 @@
 package com.gruptiga.smartlaundry.dto.response;
 
 
+import com.gruptiga.smartlaundry.entity.ServiceType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +21,7 @@ public class TransactionResponse {
 
     private String customerId;
 
-    private String serviceTypeId;
+    private ServiceType serviceType;
 
     private String status;
 

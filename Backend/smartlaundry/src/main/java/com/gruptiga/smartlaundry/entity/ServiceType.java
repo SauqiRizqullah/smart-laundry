@@ -1,9 +1,9 @@
 package com.gruptiga.smartlaundry.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gruptiga.smartlaundry.constant.ConstantTable;
 import com.gruptiga.smartlaundry.constant.Detail;
-import com.gruptiga.smartlaundry.constant.Type;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -28,17 +28,22 @@ public class ServiceType {
     @JsonBackReference
     private Account account;
 
-    @Column(name = "type")
-    @Enumerated(EnumType.STRING)
-    private Type type; //enum
+    @ManyToOne
+    @JoinColumn(name = "type_id")
+    @JsonManagedReference
+    private Type type;
 
-    @Column(name = "service")
-    private String service;
+    @ManyToOne
+    @JoinColumn(name = "service_id")
+    @JsonManagedReference
+    private Service service;
 
     @Column(name = "price")
     private Long price;
 
     @Column(name = "detail")
     @Enumerated(EnumType.STRING)
-    private Detail detail; //enum
+    private Detail detail;
+
+
 }
