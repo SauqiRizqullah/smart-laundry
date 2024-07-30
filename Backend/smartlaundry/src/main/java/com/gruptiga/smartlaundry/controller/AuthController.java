@@ -3,6 +3,7 @@ package com.gruptiga.smartlaundry.controller;
 import com.gruptiga.smartlaundry.constant.APIUrl;
 import com.gruptiga.smartlaundry.dto.request.AccountRequest;
 import com.gruptiga.smartlaundry.dto.request.AuthRequest;
+import com.gruptiga.smartlaundry.dto.request.ServiceRequest;
 import com.gruptiga.smartlaundry.dto.response.AccountResponse;
 import com.gruptiga.smartlaundry.dto.response.CommonResponse;
 import com.gruptiga.smartlaundry.dto.response.LoginResponse;
