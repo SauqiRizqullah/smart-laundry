@@ -27,10 +27,12 @@ public class APIUrl {
 
         // Service
         public static final String SERVICE = BASE_API + "/services";
+        public static final String SERVICE_ACCOUNT =  "/services";
         public static final String PATH_VAR_SERVICE_ID = "/{serviceId}";
 
         // Type
         public static final String TYPE = BASE_API + "/types";
+        public static final String TYPE_ACCOUNT =  "/types";
         public static final String PATH_VAR_TYPE_ID = "/{typesId}";
 
         // Transaction

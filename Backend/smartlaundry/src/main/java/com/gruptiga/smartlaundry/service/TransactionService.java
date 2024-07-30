@@ -1,5 +1,6 @@
 package com.gruptiga.smartlaundry.service;
 
+import com.gruptiga.smartlaundry.constant.STATUS_PEMBAYARAN;
 import com.gruptiga.smartlaundry.constant.Status;
 import com.gruptiga.smartlaundry.dto.request.SearchTransactionRequest;
 import com.gruptiga.smartlaundry.dto.request.TransactionRequest;
@@ -30,4 +31,11 @@ public interface TransactionService {
 
     TransactionResponse createNewTransactionCash(TransactionRequest request, String email);
 
+    Page<TransactionResponse> getTransactionsByEmailAndKeyword(String email, String keyword, int page, int size);
+
+    Page<TransactionResponse> getTransactionsByEmailStatusPembayaranAndKeyword(String email, STATUS_PEMBAYARAN statusPembayaran, String keyword, int page, int size);
+
+    Page<TransactionResponse> getTransactionsByEmailStatusAndKeyword(String email, Status status, String keyword, int page, int size);
+
+    Page<TransactionResponse> getTransactionsByEmailStatusStatusPembayaranAndKeyword(String email, Status status, STATUS_PEMBAYARAN statusPembayaran, String keyword, int page, int size);
 }

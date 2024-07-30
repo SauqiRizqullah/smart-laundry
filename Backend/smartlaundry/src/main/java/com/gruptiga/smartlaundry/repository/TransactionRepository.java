@@ -1,5 +1,7 @@
 package com.gruptiga.smartlaundry.repository;
 
+import com.gruptiga.smartlaundry.constant.STATUS_PEMBAYARAN;
+import com.gruptiga.smartlaundry.constant.Status;
 import com.gruptiga.smartlaundry.entity.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +32,19 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
             @Param("keyword") String keyword,
             Pageable pageable
     );
+
+
+    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND (t.trxId LIKE %:keyword% OR t.customerId LIKE %:keyword% OR t.serviceTypeId LIKE %:keyword%)")
+    Page<Transaction> findTransactionsByAccountEmailAndKeyword(@Param("email") String email, @Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.statusPembayaran = :statusPembayaran AND (t.trxId LIKE %:keyword% OR t.customerId LIKE %:keyword% OR t.serviceTypeId LIKE %:keyword%)")
+    Page<Transaction> findTransactionsByAccountEmailAndStatusPembayaranAndKeyword(@Param("email") String email, @Param("statusPembayaran") STATUS_PEMBAYARAN statusPembayaran, @Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.status = :status AND (t.trxId LIKE %:keyword% OR t.customerId LIKE %:keyword% OR t.serviceTypeId LIKE %:keyword%)")
+    Page<Transaction> findTransactionsByAccountEmailAndStatusAndKeyword(@Param("email") String email, @Param("status") Status status, @Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.status = :status AND t.statusPembayaran = :statusPembayaran AND (t.trxId LIKE %:keyword% OR t.customerId LIKE %:keyword% OR t.serviceTypeId LIKE %:keyword%)")
+    Page<Transaction> findTransactionsByAccountEmailAndStatusAndStatusPembayaranAndKeyword(@Param("email") String email, @Param("status") Status status, @Param("statusPembayaran") STATUS_PEMBAYARAN statusPembayaran, @Param("keyword") String keyword, Pageable pageable);
 
 
 }

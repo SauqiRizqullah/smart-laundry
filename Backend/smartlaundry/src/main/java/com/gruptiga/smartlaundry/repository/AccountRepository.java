@@ -2,10 +2,7 @@ package com.gruptiga.smartlaundry.repository;
 
 import com.gruptiga.smartlaundry.constant.STATUS_PEMBAYARAN;
 import com.gruptiga.smartlaundry.constant.Status;
-import com.gruptiga.smartlaundry.entity.Account;
-import com.gruptiga.smartlaundry.entity.Customer;
-import com.gruptiga.smartlaundry.entity.ServiceType;
-import com.gruptiga.smartlaundry.entity.Transaction;
+import com.gruptiga.smartlaundry.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -43,15 +40,9 @@ public interface AccountRepository extends JpaRepository<Account, String>, JpaSp
     @Query("SELECT s FROM ServiceType s WHERE s.account.email = :email AND (s.serviceTypeId LIKE %:keyword% OR s.service.serviceId LIKE %:keyword%)")
     Page<ServiceType> findServiceTypesByAccountEmailAndKeyword(@Param("email") String email, @Param("keyword") String keyword, Pageable pageable);
 
-    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND (t.trxId LIKE %:keyword% OR t.customerId LIKE %:keyword% OR t.serviceTypeId LIKE %:keyword%)")
-    Page<Transaction> findTransactionsByAccountEmailAndKeyword(@Param("email") String email, @Param("keyword") String keyword, Pageable pageable);
+    @Query("SELECT s FROM Service s WHERE s.account.email = :email AND s.name LIKE %:keyword%")
+    Page<Service> findServicesByAccountEmailAndKeyword(@Param("email") String email, @Param("keyword") String keyword, Pageable pageable);
 
-    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.statusPembayaran = :statusPembayaran AND (t.trxId LIKE %:keyword% OR t.customerId LIKE %:keyword% OR t.serviceTypeId LIKE %:keyword%)")
-    Page<Transaction> findTransactionsByAccountEmailAndStatusPembayaranAndKeyword(@Param("email") String email, @Param("statusPembayaran") STATUS_PEMBAYARAN statusPembayaran, @Param("keyword") String keyword, Pageable pageable);
-
-    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.status = :status AND (t.trxId LIKE %:keyword% OR t.customerId LIKE %:keyword% OR t.serviceTypeId LIKE %:keyword%)")
-    Page<Transaction> findTransactionsByAccountEmailAndStatusAndKeyword(@Param("email") String email, @Param("status") Status status, @Param("keyword") String keyword, Pageable pageable);
-
-    @Query("SELECT t FROM Transaction t WHERE t.account.email = :email AND t.status = :status AND t.statusPembayaran = :statusPembayaran AND (t.trxId LIKE %:keyword% OR t.customerId LIKE %:keyword% OR t.serviceTypeId LIKE %:keyword%)")
-    Page<Transaction> findTransactionsByAccountEmailAndStatusAndStatusPembayaranAndKeyword(@Param("email") String email, @Param("status") Status status, @Param("statusPembayaran") STATUS_PEMBAYARAN statusPembayaran, @Param("keyword") String keyword, Pageable pageable);
+    @Query("SELECT t FROM Type t WHERE t.account.email = :email AND t.name LIKE %:keyword%")
+    Page<Type> findTypesByAccountEmailAndKeyword(@Param("email") String email, @Param("keyword") String keyword, Pageable pageable);
 }
