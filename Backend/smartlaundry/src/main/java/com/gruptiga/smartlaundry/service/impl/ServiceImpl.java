@@ -53,6 +53,11 @@ public class ServiceImpl  implements ServiceServices {
     }
 
     @Override
+    public boolean existsById(String serviceId) {
+        return serviceRepository.existsById(serviceId);
+    }
+
+    @Override
     public List<ServicesResponse> getAllServicesByEmail(SearchCustomerRequest request) {
         return List.of();
     }

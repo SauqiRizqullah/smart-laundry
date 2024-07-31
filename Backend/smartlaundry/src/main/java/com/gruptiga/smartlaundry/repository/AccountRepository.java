@@ -19,7 +19,8 @@ import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, String>, JpaSpecificationExecutor<Account> {
-    Optional<Account> findByEmail(String email);
+    @Query("SELECT a FROM Account a WHERE LOWER(a.email) = LOWER(:email)")
+    Optional<Account> findByEmail(@Param("email") String email);
 
 
     boolean existsByEmail(String email);

@@ -45,5 +45,6 @@ public class ServiceType {
     @Enumerated(EnumType.STRING)
     private Detail detail;
 
-
+    @Column(name = "image_path")
+    private String imagePath;
 }

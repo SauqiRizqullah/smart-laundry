@@ -12,6 +12,8 @@ import java.util.List;
 public interface ServiceServices {
     ServicesResponse createService(ServiceRequest request);
 
+    boolean existsById(String serviceId);
+
     Service getById(String serviceId);
 
     List<ServicesResponse> getAllServicesByEmail (SearchCustomerRequest request);

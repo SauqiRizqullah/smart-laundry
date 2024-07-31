@@ -6,6 +6,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -22,8 +23,11 @@ public class ServiceTypeRequest {
     @NotBlank(message = "Tipe laundry wajib diisi!!!")
     private String typeId;
 
-    @NotBlank(message = "Jenis pelayanan wajib diisii!!!")
-    private String serviceId;
+//    @NotBlank(message = "Jenis pelayanan wajib diisii!!!")
+//    private String serviceId;
+
+    @NotBlank(message = "Service laundry wajib diisi!!!")
+    private ServiceRequest serviceRequest;
 
     @NotBlank(message = "Harga pelayanan wajib diisi!!!")
     private Long price;
@@ -31,4 +35,5 @@ public class ServiceTypeRequest {
     @NotBlank(message = "Keterangan dari pelayanan wajib diisi!!!")
     @Enumerated(EnumType.STRING)
     private String detail;
+
 }

@@ -79,12 +79,15 @@ public class ImageServiceImpl implements ImageService {
 
             //
 
+            String imageUrl = result.getUrl();
+            String modifiedUrl = imageUrl.replaceFirst("^https?://", "");
+
             if (result != null && result.getUrl() != null) {
                 Image image = Image.builder()
                         .imageName(multipartFile.getOriginalFilename())
                         .size(multipartFile.getSize())
                         .contentType(multipartFile.getContentType())
-                        .path(result.getUrl())
+                        .path(modifiedUrl)
                         .build();
                 imageRepository.saveAndFlush(image);
                 return image;

@@ -1,5 +1,7 @@
 package com.gruptiga.smartlaundry.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gruptiga.smartlaundry.constant.APIUrl;
 import com.gruptiga.smartlaundry.dto.request.SearchServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
@@ -15,6 +17,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,15 +27,33 @@ import java.util.List;
 public class ServiceTypeController {
     private final ServiceTypeService typeService;
 
+    private final ObjectMapper objectMapper;
+
+//    @PostMapping(produces = "application/json")
+//    public ResponseEntity<CommonResponse<ServiceTypeResponse>> createServiceType (
+//            @RequestBody ServiceTypeRequest request
+//            ){
+//        ServiceTypeResponse serviceType = typeService.createServiceType(request);
+//
+//        CommonResponse<ServiceTypeResponse> response= CommonResponse.<ServiceTypeResponse>builder()
+//                .statusCode(HttpStatus.CREATED.value())
+//                .message("Data harga pelayanan baru telah dibuat!!!")
+//                .data(serviceType)
+//                .build();
+//
+//        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+//    }
+
     @PostMapping(produces = "application/json")
     public ResponseEntity<CommonResponse<ServiceTypeResponse>> createServiceType (
             @RequestBody ServiceTypeRequest request
             ){
         ServiceTypeResponse serviceType = typeService.createServiceType(request);
 
-        CommonResponse<ServiceTypeResponse> response= CommonResponse.<ServiceTypeResponse>builder()
+        CommonResponse<ServiceTypeResponse> response = CommonResponse.<ServiceTypeResponse>
+                builder()
                 .statusCode(HttpStatus.CREATED.value())
-                .message("Data harga pelayanan baru telah dibuat!!!")
+                .message("Data pelayanan baru pada laundry berhasil dibuat!!!")
                 .data(serviceType)
                 .build();
 

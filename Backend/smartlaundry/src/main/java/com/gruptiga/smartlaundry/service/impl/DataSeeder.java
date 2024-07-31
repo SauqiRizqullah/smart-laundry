@@ -5,11 +5,13 @@ import com.gruptiga.smartlaundry.constant.Detail;
 import com.gruptiga.smartlaundry.dto.request.AccountRequest;
 import com.gruptiga.smartlaundry.dto.request.CustomerRequest;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
+import com.gruptiga.smartlaundry.dto.request.TypeRequest;
 import com.gruptiga.smartlaundry.dto.response.AccountResponse;
 import com.gruptiga.smartlaundry.entity.Account;
 import com.gruptiga.smartlaundry.service.AccountService;
 import com.gruptiga.smartlaundry.service.CustomerService;
 import com.gruptiga.smartlaundry.service.ServiceTypeService;
+import com.gruptiga.smartlaundry.service.TypeService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +26,7 @@ import static java.lang.Long.parseLong;
 public class DataSeeder {
 
     private final AccountService accountService;
-    private final ServiceTypeService typeService;
+    private final TypeService typeService;
     private final CustomerService customerService;
 
     private final PasswordEncoder passwordEncoder;
@@ -54,6 +56,14 @@ public class DataSeeder {
             log.info("Berhasil menginisiasi akun laundry di aplikasi ini!!!");
         } else {
             log.info("Akun laundry sudah tersedia di aplikasi ini!!!");
+        }
+
+        if (typeService.count() == 0){
+            TypeRequest typeRequest = TypeRequest.builder()
+                    .name("REGULAR")
+                    .build();
+
+
         }
 //
 //        if (typeService.count() == 0) {

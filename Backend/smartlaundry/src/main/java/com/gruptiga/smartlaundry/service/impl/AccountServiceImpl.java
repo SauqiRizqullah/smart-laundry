@@ -17,6 +17,7 @@ import com.gruptiga.smartlaundry.service.ImageService;
 import com.gruptiga.smartlaundry.specification.AccountSpecification;
 import com.gruptiga.smartlaundry.validation.AccountValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,6 +36,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
@@ -83,8 +85,14 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account getByEmail(String email) {
-        return accountRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Email Account tidak ditemukan!!!"));
+        log.info("Fetching account by email: {}", email);
+        Optional<Account> accountOpt = accountRepository.findByEmail(email);
+        if (accountOpt.isPresent()) {
+            log.info("Account found: {}", accountOpt.get());
+        } else {
+            log.warn("Account with email {} not found", email);
+        }
+        return accountOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Email Account tidak ditemukan!!!"));
     }
 
 

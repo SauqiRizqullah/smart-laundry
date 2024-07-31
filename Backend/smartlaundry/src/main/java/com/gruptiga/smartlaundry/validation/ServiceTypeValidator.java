@@ -28,11 +28,11 @@ public class ServiceTypeValidator {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request cannot be null");
         }
 
-        if (request.getTypeId() == null || request.getServiceId().trim().isEmpty()) {
+        if (request.getTypeId() == null || request.getServiceRequest().getServiceId().trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Type must not be empty");
         }
 
-        if (request.getServiceId() == null || request.getServiceId().trim().isEmpty() ) {
+        if (request.getServiceRequest().getServiceId() == null || request.getServiceRequest().getServiceId().trim().isEmpty() ) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Service must not be empty");
         }
 

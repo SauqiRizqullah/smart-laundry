@@ -19,4 +19,6 @@ public class ServiceTypeResponse {
     private Long price;
 
     private String detail;
+
+    private String imagePath;
 }

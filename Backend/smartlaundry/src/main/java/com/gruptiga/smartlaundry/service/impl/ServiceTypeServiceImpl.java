@@ -5,14 +5,13 @@ import com.gruptiga.smartlaundry.constant.Detail;
 import com.gruptiga.smartlaundry.dto.request.SearchServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.request.ServiceTypeRequest;
 import com.gruptiga.smartlaundry.dto.response.ServiceTypeResponse;
+import com.gruptiga.smartlaundry.dto.response.ServicesResponse;
 import com.gruptiga.smartlaundry.entity.Account;
+import com.gruptiga.smartlaundry.entity.Image;
 import com.gruptiga.smartlaundry.entity.ServiceType;
 import com.gruptiga.smartlaundry.entity.Type;
 import com.gruptiga.smartlaundry.repository.ServiceTypeRepository;
-import com.gruptiga.smartlaundry.service.AccountService;
-import com.gruptiga.smartlaundry.service.ServiceServices;
-import com.gruptiga.smartlaundry.service.ServiceTypeService;
-import com.gruptiga.smartlaundry.service.TypeService;
+import com.gruptiga.smartlaundry.service.*;
 import com.gruptiga.smartlaundry.specification.ServiceTypeSpecification;
 import com.gruptiga.smartlaundry.validation.ServiceTypeValidator;
 import jakarta.transaction.Transactional;
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +33,7 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
     private final AccountService accountService;
     private final ServiceServices serviceServices;
     private final TypeService typeService;
+    private final ImageService imageService;
 
     @Autowired
     ServiceTypeValidator serviceTypeValidator;
@@ -42,20 +43,48 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
     public ServiceTypeResponse createServiceType(ServiceTypeRequest serviceTypeRequest) {
         Account account = accountService.getByEmail(serviceTypeRequest.getEmail());
         Type type = typeService.getById(serviceTypeRequest.getTypeId());
-        com.gruptiga.smartlaundry.entity.Service service = serviceServices.getById(serviceTypeRequest.getServiceId());
+
+        com.gruptiga.smartlaundry.entity.Service service = null;
+        ServicesResponse servicesResponse = null;
+
+        if (!serviceServices.existsById(serviceTypeRequest.getServiceRequest().getServiceId())) {
+            servicesResponse = serviceServices.createService(serviceTypeRequest.getServiceRequest());
+            service = new com.gruptiga.smartlaundry.entity.Service();
+            service.setServiceId(servicesResponse.getServiceId());
+            service.setName(servicesResponse.getName());
+            service.setAccount(servicesResponse.getAccount());
+        } else {
+            service = new com.gruptiga.smartlaundry.entity.Service();
+            service.setServiceId(serviceTypeRequest.getServiceRequest().getServiceId());
+            service.setName(serviceTypeRequest.getServiceRequest().getName());
+            service.setAccount(account);
+        }
+
         serviceTypeValidator.validateCreateServiceTypeRequest(serviceTypeRequest, account, service, type);
 
-        ServiceType serviceType = ServiceType.builder()
+        Image image = null;
+        if (Objects.equals(service.getName(), "Cuci Full")){
+            image = imageService.searchByName("CuciFull.jpg");
+        }
+
+        ServiceType.ServiceTypeBuilder serviceType = ServiceType.builder()
                 .type(type)
                 .service(service)
                 .price(serviceTypeRequest.getPrice())
                 .detail(Detail.valueOf(serviceTypeRequest.getDetail().toUpperCase()))
-                .account(account)
-                .build();
+                .account(account);
 
-        serviceTypeRepository.saveAndFlush(serviceType);
+        if (image != null) {
+            serviceType.imagePath(image.getPath());
+        }
 
-        return parseServiceTypeToServiceTypeResponse(serviceType);
+        ServiceType savedServiceType = serviceTypeRepository.saveAndFlush(serviceType.build());
+
+        if (servicesResponse != null) {
+            service.setServiceTypes(servicesResponse.getServiceTypes());
+        }
+
+        return parseServiceTypeToServiceTypeResponse(savedServiceType);
     }
 
     private ServiceTypeResponse parseServiceTypeToServiceTypeResponse(ServiceType serviceType) {
@@ -70,6 +99,7 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
                 .serviceTypeId(id)
                 .type(serviceType.getType())
                 .service(serviceType.getService())
+                .imagePath(serviceType.getImagePath())
                 .price(serviceType.getPrice())
                 .detail(serviceType.getDetail().toString().toLowerCase())
                 .build();
@@ -100,7 +130,7 @@ public class ServiceTypeServiceImpl implements ServiceTypeService {
        ServiceType serviceType1 = serviceTypeRepository.findById(serviceType.getServiceTypeId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer ID not found"));
        Type typeService1 = typeService.getById(serviceTypeRequest.getTypeId());
-       com.gruptiga.smartlaundry.entity.Service service = serviceServices.getById(serviceTypeRequest.getServiceId());
+       com.gruptiga.smartlaundry.entity.Service service = serviceServices.getById(serviceTypeRequest.getServiceRequest().getServiceId());
 
        serviceType1.setPrice(serviceTypeRequest.getPrice());
        serviceType1.setType(typeService1);

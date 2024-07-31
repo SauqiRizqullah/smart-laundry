@@ -72,7 +72,7 @@ public class TypeServiceImpl implements TypeService {
 
     @Override
     public long count() {
-        return 0;
+        return typeRepository.count();
     }
 
 
