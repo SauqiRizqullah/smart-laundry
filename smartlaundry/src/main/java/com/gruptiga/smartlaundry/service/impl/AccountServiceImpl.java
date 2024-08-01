@@ -202,6 +202,7 @@ public class AccountServiceImpl implements AccountService {
                         .service(s.getService())
                         .price(s.getPrice())
                         .detail(String.valueOf(s.getDetail()))
+                        .imagePath(s.getImagePath())
                         .build())
                 .collect(Collectors.toList());
 

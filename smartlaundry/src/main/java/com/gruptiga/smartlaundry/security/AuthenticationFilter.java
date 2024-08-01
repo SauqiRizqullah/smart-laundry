@@ -14,64 +14,51 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Component
-@RequiredArgsConstructor
+@Component@RequiredArgsConstructor
 @Slf4j
 public class AuthenticationFilter extends OncePerRequestFilter {
-    final String AUTH_HEADER = "Authorization";
+    private static final String AUTH_HEADER = "Authorization";
     private final JwtService jwtService;
     private final UserService userService;
     private final TokenRepository tokenRepository;
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String token = request.getHeader(AUTH_HEADER);
         try {
-            String bearerToken = request.getHeader(AUTH_HEADER);
-
-            // Periksa apakah token diawali dengan kata "Bearer"
-            if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-                // Hapus kata "Bearer" dari token
-                String token = bearerToken.substring(7);
-
-                // Periksa apakah token ada dalam daftar token yang diblokir
+            if (token != null) {
                 if (tokenRepository.findByToken(token).isPresent()) {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    return;
-                }
-
-                // verify token
+                    return;                }
+                // Verifikasi token
                 if (jwtService.verifyJwtToken(token)) {
-                    // claims token/ decode token
+                    // Dekode klaim token
                     JwtClaims decodeJwt = jwtService.getClaimsByToken(token);
-
-                    // find UserAccount by id form sub in token
+                    // Temukan UserAccount berdasarkan ID dari klaim token
                     Account userAccountBySub = userService.getByUserId(decodeJwt.getUserAccountId());
-                    // verify Authentication use UserPassAuthToken
+                    // Buat token autentikasi
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             userAccountBySub.getUsername(),
                             null,
-                            userAccountBySub.getAuthorities()
-                    );
-
-                    // kita masukkan detail detail lain seperti ip addres, siapa yg ngehit
-                    authentication.setDetails(new WebAuthenticationDetails(request));
-
-                    // Set ini Security Context
+                            userAccountBySub.getAuthorities()                    );
+                    // Set detail autentikasi, seperti IP address
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    // Set autentikasi di Security Context
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
+                } else {
+
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;                }
             }
         } catch (Exception e) {
-            log.error("Cannot set user authentication: {}", e.getMessage());
-        }
-
-        // ibarat finally
-        // Lempar ke controller
+            log.error("Cannot set user authentication: {}", e.getMessage());            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;        }
+        // Lanjutkan ke filter berikutnya
         filterChain.doFilter(request, response);
     }
 }
-
